@@ -47,6 +47,37 @@ class User {
             callback(err, isMatch);
         });
     }
+
+    static getPaginated(limit, offset, callback) {
+        const query = `SELECT * FROM Users LIMIT ? OFFSET ?`;
+        db.all(query, [limit, offset], (err, rows) => {
+            callback(err, rows);
+        });
+    }
+
+    static filter(filters, callback) {
+        let query = "SELECT * FROM Users WHERE 1=1";
+        const params = [];
+    
+        if (filters.role) {
+            query += " AND role = ?";
+            params.push(filters.role);
+        }
+    
+        if (filters.username) {
+            query += " AND username LIKE ?";
+            params.push(`%${filters.username}%`);
+        }
+    
+        db.all(query, params, (err, rows) => {
+            if (err) {
+                callback(err, null);
+            } else {
+                callback(null, rows);
+            }
+        });
+    }
+    
 }
 
 module.exports = User;

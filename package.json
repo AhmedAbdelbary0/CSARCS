@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "init-db": "sqlite3 backend/database/database.sqlite < backend/database/schema.sql"
   },
   "keywords": [],
@@ -15,8 +15,16 @@
     "body-parser": "^1.20.3",
     "cors": "^2.8.5",
     "express": "^4.21.1",
+    "express-validator": "^7.2.0",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.13.1",
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^5.1.7",
+    "winston": "^3.17.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0"
+  },"jest": {
+    "roots": ["<rootDir>/tests"]
   }
 }

@@ -35,6 +35,41 @@ class Task {
             callback(err, this?.changes);
         });
     }
+
+    static getPaginated(limit, offset, callback) {
+        const query = `SELECT * FROM Tasks LIMIT ? OFFSET ?`;
+        db.all(query, [limit, offset], (err, rows) => {
+            callback(err, rows);
+        });
+    }
+    
+    static filter(filters, callback) {
+        let query = "SELECT * FROM Tasks WHERE 1=1"; // 1=1 makes appending conditions easier
+        const params = [];
+    
+        if (filters.status) {
+            query += " AND status = ?";
+            params.push(filters.status);
+        }
+    
+        if (filters.request_id) {
+            query += " AND request_id = ?";
+            params.push(filters.request_id);
+        }
+    
+        if (filters.accept_id) {
+            query += " AND accept_id = ?";
+            params.push(filters.accept_id);
+        }
+    
+        db.all(query, params, (err, rows) => {
+            if (err) {
+                callback(err, null);
+            } else {
+                callback(null, rows);
+            }
+        });
+    }
 }
 
 module.exports = Task;

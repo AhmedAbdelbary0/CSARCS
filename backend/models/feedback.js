@@ -24,6 +24,14 @@ class Feedback {
             callback(err, rows);
         });
     }
+
+    static getByUserId(user_id, callback) {
+        const sql = `SELECT * FROM Feedback WHERE user_id = ?`;
+        db.all(sql, [user_id], (err, rows) => {
+            callback(err, rows);
+        });
+    }
+
 }
 
 module.exports = Feedback;

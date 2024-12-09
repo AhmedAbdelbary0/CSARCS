@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Junior Dashboard</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        /* إعدادات الصفحة الأساسية */
+        html, body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    
+        .dashboard {
+            width: 90%;
+            max-width: 1200px;
+            height: 90vh; /* تغطية أكبر جزء من الشاشة */
+            background: white;
+            padding: 40px; /* زيادة المساحة الداخلية */
+            box-sizing: border-box;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+        }
+    
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+            font-size: 48px; /* زيادة حجم العنوان */
+        }
+    
+        /* البطاقة الشخصية */
+        .profile-card {
+            background-color: #3d3d3d;
+            color: white;
+            padding: 40px; /* زيادة الحجم الداخلي */
+            border-radius: 8px;
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            margin-bottom: 30px;
+            font-size: 24px; /* تكبير النصوص داخل البطاقة */
+        }
+    
+        .profile-card .circle {
+            width: 120px; /* تكبير الدائرة */
+            height: 120px;
+            margin: 0 auto 20px;
+            background-color: #bbb;
+            border-radius: 50%;
+        }
+    
+        .profile-card p {
+            margin: 15px 0;
+        }
+    
+        /* تنسيق الأزرار */
+        .button {
+            display: inline-block;
+            width: 100%;
+            max-width: 400px; /* زيادة عرض الأزرار */
+            padding: 16px; /* زيادة حجم النص الداخلي */
+            margin: 20px 0;
+            text-align: center;
+            background-color: #40E0D0; /* تركواز */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 22px; /* تكبير النص في الأزرار */
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+    
+        .button:hover {
+            background-color: #20B2AA; /* تركواز داكن */
+        }
+    
+        /* الطلبات النشطة */
+        .requests {
+            font-size: 20px; /* تكبير النص في الطلبات */
+            margin-bottom: 20px;
+            text-align: left;
+            width: 100%;
+            max-width: 500px;
+        }
+    
+        /* رسالة التأكيد */
+        .confirmation {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            border-radius: 4px;
+            font-size: 20px; /* تكبير النص */
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+    </style>
+    
+    
+    
+    <script>
+        // Show the confirmation message if redirected back from the request page
+        function showConfirmationOnReturn() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('confirmation') === 'true') {
+                document.getElementById('confirmationMessage').style.display = 'block';
+            }
+        }
+
+        window.onload = showConfirmationOnReturn;
+    </script>
+</head>
+<body>
+    <div class="dashboard">
+
+        <h1>Welcome, Junior Student</h1>
+        <!-- User Information -->
+        <div class="profile-card">
+            <div class="circle"></div>
+            <p><strong>Name:</strong> John Doe</p>
+            <p><strong>ID:</strong> 123456</p>
+        </div>
+        
+        
+        <h3>Active Requests:</h3>
+        <ul>
+            <li>Request 1...</li>
+            <li>Request 2...</li>
+        </ul>
+        <a href="request_assistance.html" class="button">Request New Assistance</a>
+        
+        <!-- Confirmation Section -->
+        <div id="confirmationMessage" class="confirmation">
+            <p><strong>Confirmation:</strong> Your request has been submitted successfully!</p>
+        </div>
+    </div>
+</body>
+</html>

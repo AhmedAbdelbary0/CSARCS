@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Requests</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* إعدادات الصفحة الأساسية */
+        html, body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    
+        .dashboard {
+            width: 90%;
+            max-width: 1200px;
+            height: 90vh; /* تغطية أكبر جزء من الشاشة */
+            background: white;
+            padding: 40px; /* زيادة المساحة الداخلية */
+            box-sizing: border-box;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+        }
+    
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+            font-size: 48px; /* زيادة حجم العنوان */
+        }
+    
+        /* البطاقة الشخصية */
+        .profile-card {
+            background-color: #3d3d3d;
+            color: white;
+            padding: 40px; /* زيادة الحجم الداخلي */
+            border-radius: 8px;
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            margin-bottom: 30px;
+            font-size: 24px; /* تكبير النصوص داخل البطاقة */
+        }
+    
+        .profile-card .circle {
+            width: 120px; /* تكبير الدائرة */
+            height: 120px;
+            margin: 0 auto 20px;
+            background-color: #bbb;
+            border-radius: 50%;
+        }
+    
+        .profile-card p {
+            margin: 15px 0;
+        }
+    
+        /* تنسيق الأزرار */
+        .button {
+            display: inline-block;
+            width: 100%;
+            max-width: 400px; /* زيادة عرض الأزرار */
+            padding: 16px; /* زيادة حجم النص الداخلي */
+            margin: 20px 0;
+            text-align: center;
+            background-color: #40E0D0; /* تركواز */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 22px; /* تكبير النص في الأزرار */
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+    
+        .button:hover {
+            background-color: #20B2AA; /* تركواز داكن */
+        }
+    
+        /* الطلبات النشطة */
+        .requests {
+            font-size: 20px; /* تكبير النص في الطلبات */
+            margin-bottom: 20px;
+            text-align: left;
+            width: 100%;
+            max-width: 500px;
+        }
+    
+        /* رسالة التأكيد */
+        .confirmation {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            border-radius: 4px;
+            font-size: 20px; /* تكبير النص */
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+    </style>
+    
+</head>
+<body class="bg-light text-center py-5">
+    <div class="container bg-white p-5 rounded shadow">
+        <h1>Available Requests</h1>
+        <p>No available requests at the moment.</p>
+        <a href="senior_dashboard.html" class="btn btn-primary btn-lg w-100">Back to Dashboard</a>
+    </div>
+</body>
+</html>

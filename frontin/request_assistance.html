@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Assistance</title>
+    <!-- Include Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light d-flex align-items-center justify-content-center" style="height: 100vh;">
+    <div class="container p-4 bg-white shadow rounded" style="max-width: 600px;">
+        <h1 class="text-center mb-4 text-primary">Request Assistance</h1>
+        <form onsubmit="handleFormSubmission(event)">
+            <div class="mb-3">
+                <label for="title" class="form-label">Title</label>
+                <input type="text" id="title" name="title" class="form-control" placeholder="Enter the request title" required>
+            </div>
+            <div class="mb-3">
+                <label for="subject" class="form-label">Subject</label>
+                <input type="text" id="subject" name="subject" class="form-control" placeholder="Enter the subject" required>
+            </div>
+            <div class="mb-3">
+                <label for="details" class="form-label">Details</label>
+                <textarea id="details" name="details" rows="5" class="form-control" placeholder="Provide more details about your request" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Submit Request</button>
+        </form>
+        <div class="text-center mt-3 text-muted">
+            <small>Need help? Contact your admin for support.</small>
+        </div>
+    </div>
+
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function handleFormSubmission(event) {
+            event.preventDefault(); // Prevent the default form submission behavior
+            
+            // Simulate request submission logic
+            console.log("Request submitted successfully!");
+
+            // Redirect to the dashboard with confirmation parameter
+            window.location.href = "junior_dashboard.html?confirmation=true";
+        }
+    </script>
+</body>
+</html>

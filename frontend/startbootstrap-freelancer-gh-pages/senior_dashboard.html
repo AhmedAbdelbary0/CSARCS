@@ -6,7 +6,7 @@
     <title>Senior Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* إعدادات الصفحة الأساسية */
+       
         html, body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f9;
@@ -22,9 +22,9 @@
         .dashboard {
             width: 90%;
             max-width: 1200px;
-            height: auto; /* جعل الطول ديناميكيًا حسب المحتوى */
+            height: auto; 
             background: white;
-            padding: 40px; /* زيادة المساحة الداخلية */
+            padding: 40px; 
             box-sizing: border-box;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -38,24 +38,24 @@
             text-align: center;
             margin-bottom: 30px;
             color: #333;
-            font-size: 48px; /* زيادة حجم العنوان */
+            font-size: 48px;
         }
 
-        /* البطاقة الشخصية */
+       
         .profile-card {
             background-color: #3d3d3d;
             color: white;
-            padding: 40px; /* زيادة الحجم الداخلي */
+            padding: 40px; 
             border-radius: 8px;
             text-align: center;
             max-width: 500px;
             width: 100%;
             margin-bottom: 30px;
-            font-size: 24px; /* تكبير النصوص داخل البطاقة */
+            font-size: 24px;
         }
 
         .profile-card img {
-            width: 120px; /* تكبير الصورة */
+            width: 120px; 
             height: 120px;
             margin: 0 auto 20px;
             border-radius: 50%;
@@ -71,30 +71,30 @@
             font-size: 20px;
         }
 
-        /* تنسيق الأزرار */
+       
         .dashboard-buttons a {
             display: block;
             width: 100%;
             max-width: 400px;
-            padding: 16px; /* زيادة حجم النص الداخلي */
-            margin: 10px auto; /* توسيط الأزرار */
+            padding: 16px; 
+            margin: 10px auto;
             text-align: center;
-            background-color: #40E0D0; /* تركواز */
+            background-color: #40E0D0; 
             color: white;
             border: none;
             border-radius: 8px;
             cursor: pointer;
             text-decoration: none;
-            font-size: 22px; /* تكبير النص في الأزرار */
+            font-size: 22px; 
             font-weight: bold;
             transition: background-color 0.3s ease;
         }
 
         .dashboard-buttons a:hover {
-            background-color: #20B2AA; /* تركواز داكن */
+            background-color: #20B2AA;
         }
 
-        /* النص المساعد */
+       
         .text-muted {
             font-size: 20px;
             margin-bottom: 30px;
@@ -110,8 +110,8 @@
         <div class="profile-card bg-dark text-white rounded p-4 mb-4 text-center">
             <img src="https://via.placeholder.com/80" alt="User Profile" 
                  class="rounded-circle mx-auto d-block mb-3" style="width: 80px; height: 80px;">
-            <h3 class="mt-3">John Doe</h3>
-            <p>ID: 123456</p>
+            <h3 class="mt-3" id="username">Loading...</h3>
+            <p id="userId">Loading...</p>
         </div>
         
        
@@ -125,5 +125,55 @@
         </div>
 
     </div>
+
+    <script>
+        const backendUrl = "http://localhost:3000"; // Update with your backend URL
+        const token = localStorage.getItem("token"); // Get token from localStorage
+    
+        // Redirect to login if token is missing
+        if (!token) {
+            window.location.href = "index.html";
+        }
+    
+        // Fetch user details and update the page
+       async function fetchUserDetails() {
+        const backendUrl = "http://localhost:3000";
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            console.error("No token found. Redirecting to login.");
+            window.location.href = "index.html";
+            return;
+        }
+
+        try {
+            const response = await fetch(`${backendUrl}/api/auth/me`, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                },
+            });
+
+            if (response.ok) {
+                const user = await response.json();
+                console.log("User Details:", user);
+                document.getElementById("username").innerText = user.username;
+                document.getElementById("userId").innerText = `ID: ${user.id}`;
+            } else {
+                const error = await response.json();
+                console.error("Failed to fetch user details:", error);
+                window.location.href = "index.html";
+            }
+        } catch (err) {
+            console.error("Error fetching user details:", err);
+            window.location.href = "index.html";
+        }
+        }
+
+    
+        // Fetch user details when the page loads
+        fetchUserDetails();
+    </script>
+    
 </body>
 </html>

@@ -2,6 +2,7 @@ const express = require('express');
 const { body, validationResult } = require('express-validator'); // Import express-validator
 const router = express.Router();
 const jwt = require('jsonwebtoken');
+const { authenticateToken } = require('../middleware/authMiddleware');
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
 const AppError = require('../utils/AppError'); // Import custom AppError
@@ -74,7 +75,7 @@ router.get('/me', authenticateToken, async (req, res) => {
     } catch (err) {
         res.status(500).json({ message: 'Server error', error: err.message });
     }
-});
+}); 
 
 
 

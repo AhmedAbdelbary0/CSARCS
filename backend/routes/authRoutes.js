@@ -49,12 +49,34 @@ router.post(
 
             // Generate a JWT
             const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
-            res.status(200).json({ message: 'Login successful', token });
+
+            // Include the role in the response
+            res.status(200).json({ message: 'Login successful', token, role: user.role });
         } catch (err) {
             next(err); // Pass error to centralized error handler
         }
     }
 );
+
+// Route to get the logged-in user's details
+router.get('/me', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.id; // Extracted from the JWT payload
+        const user = await new Promise((resolve, reject) =>
+            User.getById(userId, (err, user) => (err ? reject(err) : resolve(user)))
+        );
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.json({ id: user.id, username: user.username, role: user.role });
+    } catch (err) {
+        res.status(500).json({ message: 'Server error', error: err.message });
+    }
+});
+
+
 
 // Token Verification Route
 router.post(

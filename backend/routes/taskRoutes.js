@@ -16,6 +16,27 @@ const handleValidationErrors = (req, res, next) => {
     next();
 };
 
+// Route to fetch available tasks
+router.get(
+    '/available',
+    authenticateToken,
+    roleMiddleware(['senior']),
+    async (req, res, next) => {
+        try {
+            const tasks = await new Promise((resolve, reject) =>
+                Task.getAll((err, tasks) => (err ? reject(err) : resolve(tasks)))
+            );
+
+            // Filter tasks with status "open"
+            const availableTasks = tasks.filter(task => task.status === 'open');
+
+            res.status(200).json(availableTasks);
+        } catch (err) {
+            next(err);
+        }
+    }
+);
+
 // Route to fetch all tasks
 router.get(
     '/',

@@ -6,7 +6,6 @@
     <title>Available Requests</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* إعدادات الصفحة الأساسية */
         html, body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f9;
@@ -22,9 +21,9 @@
         .dashboard {
             width: 90%;
             max-width: 1200px;
-            height: 90vh; /* تغطية أكبر جزء من الشاشة */
+            height: 90vh; 
             background: white;
-            padding: 40px; /* زيادة المساحة الداخلية */
+            padding: 40px;
             box-sizing: border-box;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -38,24 +37,24 @@
             text-align: center;
             margin-bottom: 30px;
             color: #333;
-            font-size: 48px; /* زيادة حجم العنوان */
+            font-size: 48px;
         }
     
-        /* البطاقة الشخصية */
+       
         .profile-card {
             background-color: #3d3d3d;
             color: white;
-            padding: 40px; /* زيادة الحجم الداخلي */
+            padding: 40px;
             border-radius: 8px;
             text-align: center;
             max-width: 500px;
             width: 100%;
             margin-bottom: 30px;
-            font-size: 24px; /* تكبير النصوص داخل البطاقة */
+            font-size: 24px; 
         }
     
         .profile-card .circle {
-            width: 120px; /* تكبير الدائرة */
+            width: 120px; 
             height: 120px;
             margin: 0 auto 20px;
             background-color: #bbb;
@@ -66,39 +65,36 @@
             margin: 15px 0;
         }
     
-        /* تنسيق الأزرار */
         .button {
             display: inline-block;
             width: 100%;
-            max-width: 400px; /* زيادة عرض الأزرار */
-            padding: 16px; /* زيادة حجم النص الداخلي */
+            max-width: 400px;
+            padding: 16px; 
             margin: 20px 0;
             text-align: center;
-            background-color: #40E0D0; /* تركواز */
+            background-color: #40E0D0; 
             color: white;
             border: none;
             border-radius: 8px;
             cursor: pointer;
             text-decoration: none;
-            font-size: 22px; /* تكبير النص في الأزرار */
+            font-size: 22px; 
             font-weight: bold;
             transition: background-color 0.3s ease;
         }
     
         .button:hover {
-            background-color: #20B2AA; /* تركواز داكن */
+            background-color: #20B2AA; 
         }
     
-        /* الطلبات النشطة */
         .requests {
-            font-size: 20px; /* تكبير النص في الطلبات */
+            font-size: 20px; 
             margin-bottom: 20px;
             text-align: left;
             width: 100%;
             max-width: 500px;
         }
     
-        /* رسالة التأكيد */
         .confirmation {
             margin-top: 20px;
             padding: 20px;
@@ -106,7 +102,7 @@
             border: 1px solid #c3e6cb;
             color: #155724;
             border-radius: 4px;
-            font-size: 20px; /* تكبير النص */
+            font-size: 20px; 
             text-align: center;
             max-width: 500px;
             width: 100%;
@@ -117,8 +113,89 @@
 <body class="bg-light text-center py-5">
     <div class="container bg-white p-5 rounded shadow">
         <h1>Available Requests</h1>
-        <p>No available requests at the moment.</p>
+        <div id="tasksContainer">
+            <p>Loading available requests...</p>
+        </div>
         <a href="senior_dashboard.html" class="btn btn-primary btn-lg w-100">Back to Dashboard</a>
     </div>
+    <script>
+        const backendUrl = "http://localhost:3000"; // Backend base URL
+        const token = localStorage.getItem("token"); // Retrieve token from localStorage
+    
+        // Redirect to login if no token is found
+        if (!token) {
+            console.error("No token found. Redirecting to login.");
+            window.location.href = "index.html";
+        }
+    
+        // Fetch available tasks and render them
+        async function fetchAvailableTasks() {
+            try {
+                const response = await fetch(`${backendUrl}/api/tasks/available`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                    },
+                });
+    
+                if (response.ok) {
+                    const tasks = await response.json();
+                    const tasksContainer = document.getElementById("tasksContainer");
+                    tasksContainer.innerHTML = ""; // Clear any placeholder text
+    
+                    if (tasks.length > 0) {
+                        tasks.forEach(task => {
+                            const taskItem = `
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h5 class="card-title">${task.title}</h5>
+                                        <p class="card-text">${task.description}</p>
+                                        <p class="text-muted">Posted on: ${new Date(task.time_created).toLocaleString()}</p>
+                                        <button class="btn btn-primary" onclick="acceptTask(${task.id})">Accept Task</button>
+                                    </div>
+                                </div>
+                            `;
+                            tasksContainer.innerHTML += taskItem;
+                        });
+                    } else {
+                        tasksContainer.innerHTML = `<p>No available requests at the moment.</p>`;
+                    }
+                } else {
+                    console.error("Failed to fetch tasks.");
+                    alert("Could not fetch tasks. Please try again later.");
+                }
+            } catch (err) {
+                console.error("Error fetching tasks:", err);
+                alert("Could not connect to the backend. Please try again later.");
+            }
+        }
+    
+        // Accept task function
+        async function acceptTask(taskId) {
+            try {
+                const response = await fetch(`${backendUrl}/api/tasks/accept/${taskId}`, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    }
+                });
+    
+                if (response.ok) {
+                    alert("Task accepted successfully!");
+                    fetchAvailableTasks(); // Refresh the list
+                } else {
+                    console.error("Failed to accept task.");
+                    alert("Could not accept task. Please try again.");
+                }
+            } catch (err) {
+                console.error("Error accepting task:", err);
+                alert("Could not connect to the backend. Please try again later.");
+            }
+        }
+    
+        // Fetch tasks on page load
+        window.onload = fetchAvailableTasks;
+    </script>
 </body>
 </html>

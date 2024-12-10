@@ -59,6 +59,39 @@ router.post(
     }
 );
 
+// Route to register a new user
+router.post(
+    '/register',
+    [
+        body('username').isString().trim().notEmpty().withMessage('Username is required'),
+        body('email').isEmail().withMessage('Invalid email address'),
+        body('password')
+            .isLength({ min: 6 })
+            .withMessage('Password must be at least 6 characters long'),
+        body('role')
+            .isIn(['admin', 'junior', 'senior', 'faculty'])
+            .withMessage('Invalid role'),
+    ],
+    handleValidationErrors,
+    async (req, res, next) => {
+        try {
+            const { username, email, password, role } = req.body;
+
+            // Hash the password
+            const hashedPassword = await bcrypt.hash(password, 10);
+
+            // Save the user to the database
+            const userId = await new Promise((resolve, reject) =>
+                User.create(username, email, hashedPassword, role, (err, id) => (err ? reject(err) : resolve(id)))
+            );
+
+            res.status(201).json({ message: 'User created successfully', id: userId });
+        } catch (err) {
+            next(err);
+        }
+    }
+);
+
 // Route to get the logged-in user's details
 router.get('/me', authenticateToken, async (req, res) => {
     try {

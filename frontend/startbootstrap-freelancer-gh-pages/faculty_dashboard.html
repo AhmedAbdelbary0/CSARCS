@@ -113,5 +113,50 @@
             </div>
         </div>
     </div>
+    
+    <script>
+        const backendUrl = "http://localhost:3000"; // Backend base URL
+        const token = localStorage.getItem("token"); // Retrieve the token from localStorage
+    
+        // Redirect to login if no token is found
+        if (!token) {
+            console.error("No token found. Redirecting to login.");
+            window.location.href = "index.html";
+        }
+    
+        // Fetch and display user details
+        async function fetchUserDetails() {
+            try {
+                const response = await fetch(`${backendUrl}/api/auth/me`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                    },
+                });
+    
+                if (response.ok) {
+                    const user = await response.json();
+                    console.log("User Details:", user);
+    
+                    // Update profile card dynamically
+                    document.querySelector(".profile-card h3").innerText = user.username;
+                    document.querySelector(".profile-card p").innerText = `ID: ${user.id}`;
+                } else {
+                    const error = await response.json();
+                    console.error("Failed to fetch user details:", error);
+                    alert("Session expired. Please log in again.");
+                    window.location.href = "index.html";
+                }
+            } catch (err) {
+                console.error("Error fetching user details:", err);
+                alert("Could not connect to the backend. Please try again later.");
+                window.location.href = "index.html";
+            }
+        }
+    
+        // Call the function when the page loads
+        window.onload = fetchUserDetails;
+    </script>
+    
 </body>
 </html>

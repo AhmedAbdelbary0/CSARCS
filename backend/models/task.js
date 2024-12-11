@@ -80,6 +80,22 @@ class Task {
             }
         });
     }
+    static getActiveSessions(seniorId, callback) {
+        const sql = `
+            SELECT *
+            FROM Tasks
+            WHERE accept_id = ? AND status = 'assigned'
+            ORDER BY time_updated DESC
+        `;
+        db.all(sql, [seniorId], (err, rows) => {
+            if (err) {
+                console.error("Error fetching active sessions:", err.message);
+                return callback(err, null);
+            }
+            callback(null, rows);
+        });
+    };
+    
 }
 
 module.exports = Task;

@@ -172,27 +172,34 @@
     
         // Accept task function
         async function acceptTask(taskId) {
+            const backendUrl = "http://localhost:3000"; // Backend base URL
+            const token = localStorage.getItem("token"); // Retrieve token from localStorage
+
             try {
-                const response = await fetch(`${backendUrl}/api/tasks/accept/${taskId}`, {
-                    method: "POST",
+                const response = await fetch(`${backendUrl}/api/tasks/${taskId}/status`, {
+                    method: "PUT",
                     headers: {
                         "Authorization": `Bearer ${token}`,
-                        "Content-Type": "application/json"
-                    }
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ status: "assigned" }), // Correct status
                 });
-    
+
                 if (response.ok) {
-                    alert("Task accepted successfully!");
-                    fetchAvailableTasks(); // Refresh the list
+                    alert("Task assigned successfully!");
+                    fetchAvailableTasks(); // Refresh the list after acceptance
                 } else {
-                    console.error("Failed to accept task.");
-                    alert("Could not accept task. Please try again.");
+                    const error = await response.json();
+                    console.error("Failed to accept task:", error);
+                    alert(`Could not accept task: ${error.errors[0]?.msg || "Unknown error"}`);
                 }
             } catch (err) {
                 console.error("Error accepting task:", err);
                 alert("Could not connect to the backend. Please try again later.");
             }
         }
+
+
     
         // Fetch tasks on page load
         window.onload = fetchAvailableTasks;

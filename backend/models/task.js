@@ -10,6 +10,16 @@ class Task {
             callback(err, this?.lastID);
         });
     }
+    static accept(id, accept_id, callback) {
+        const sql = `
+            UPDATE Tasks
+            SET status = 'assigned', accept_id = ?, time_updated = datetime('now')
+            WHERE id = ?
+        `;
+        db.run(sql, [accept_id, id], function (err) {
+            callback(err, this?.changes);
+        });
+    }
 
     static getAll(callback) {
         const sql = `SELECT * FROM Tasks`;

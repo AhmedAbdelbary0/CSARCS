@@ -11,10 +11,12 @@ const AppError = require('../utils/AppError'); // Import custom AppError
 const handleValidationErrors = (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+        console.error("Validation Errors:", errors.array()); // Log validation errors
         return res.status(400).json({ errors: errors.array() });
     }
     next();
 };
+
 
 // Route to fetch available tasks
 router.get(
@@ -117,28 +119,60 @@ router.put(
     authenticateToken,
     [
         param('id').isInt().withMessage('Task ID must be an integer'),
-        body('status').isIn(['open', 'in_progress', 'completed']).withMessage('Invalid status'),
+        body('status').isIn(['open', 'assigned', 'completed']).withMessage('Invalid status'),
     ],
     handleValidationErrors,
     async (req, res, next) => {
         try {
-            const taskId = req.params.id;
+            const taskId = parseInt(req.params.id, 10);
             const { status } = req.body;
+            const acceptId = req.user.id; // Get logged-in user's ID from the token
 
-            const changes = await new Promise((resolve, reject) =>
-                Task.updateStatus(taskId, status, (err, changes) => (err ? reject(err) : resolve(changes)))
-            );
+            if (status === 'assigned') {
+                // Ensure the task is open before assigning
+                const task = await new Promise((resolve, reject) =>
+                    Task.findById(taskId, (err, task) => (err ? reject(err) : resolve(task)))
+                );
 
-            if (changes === 0) {
-                throw new AppError('Task not found or no changes made', 404);
+                if (!task || task.status !== 'open') {
+                    console.error(`Task is not available for assignment: Task ID ${taskId}, Current Status: ${task?.status}`);
+                    throw new AppError('Task is not available for assignment', 400);
+                }
+
+                // Accept the task
+                const changes = await new Promise((resolve, reject) =>
+                    Task.accept(taskId, acceptId, (err, changes) => (err ? reject(err) : resolve(changes)))
+                );
+
+                if (changes === 0) {
+                    console.error(`Task not found or already assigned: Task ID ${taskId}`);
+                    throw new AppError('Task not found or already assigned', 404);
+                }
+
+                console.log(`Task assigned successfully: Task ID ${taskId}, Assigned To: ${acceptId}`);
+                res.status(200).json({ message: 'Task assigned successfully' });
+            } else {
+                // Handle other status updates
+                const changes = await new Promise((resolve, reject) =>
+                    Task.updateStatus(taskId, status, (err, changes) => (err ? reject(err) : resolve(changes)))
+                );
+
+                if (changes === 0) {
+                    console.error(`Task not found or no changes made: Task ID ${taskId}`);
+                    throw new AppError('Task not found or no changes made', 404);
+                }
+
+                console.log(`Task status updated successfully: Task ID ${taskId}, New Status: ${status}`);
+                res.status(200).json({ message: 'Task status updated successfully' });
             }
-
-            res.status(200).json({ message: 'Task status updated successfully' });
         } catch (err) {
+            console.error(`Error updating task status: ${err.message}`);
             next(err);
         }
     }
 );
+
+
 
 // Route to approve a task
 router.patch(

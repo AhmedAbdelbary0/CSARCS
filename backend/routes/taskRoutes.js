@@ -108,6 +108,29 @@ router.get(
         }
     }
 );
+
+// Route to fetch completed tasks assigned to the logged-in user
+router.get(
+    '/completed-sessions',
+    authenticateToken,
+    roleMiddleware(['senior']),
+    async (req, res, next) => {
+        try {
+            const seniorId = req.user.id; // Get logged-in user's ID from the token
+
+            // Fetch completed tasks assigned to the current user
+            const tasks = await new Promise((resolve, reject) =>
+                Task.getCompletedSessions(seniorId, (err, tasks) => (err ? reject(err) : resolve(tasks)))
+            );
+
+            res.status(200).json(tasks);
+        } catch (err) {
+            console.error("Error fetching completed sessions:", err.message);
+            next(err);
+        }
+    }
+);
+
 // Route to fetch a task by ID
 router.get(
     '/:id',

@@ -5,12 +5,93 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Session History</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .task-card {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+    </style>
 </head>
-<body class="bg-light text-center py-5">
-    <div class="container bg-white p-5 rounded shadow">
+<body>
+    <div class="container">
         <h1>Session History</h1>
-        <p>You have no previous sessions.</p>
-        <a href="senior_dashboard.html" class="btn btn-primary btn-lg w-100">Back to Dashboard</a>
+        <div id="completedSessionsContainer">
+            <p>Loading completed sessions...</p>
+        </div>
+        <a href="senior_dashboard.html" class="btn btn-primary mt-4">Back to Dashboard</a>
     </div>
+
+    <script>
+        const backendUrl = "http://localhost:3000"; // Backend base URL
+        const token = localStorage.getItem("token"); // Retrieve token from localStorage
+
+        // Redirect to login if no token is found
+        if (!token) {
+            console.error("No token found. Redirecting to login.");
+            window.location.href = "index.html";
+        }
+
+        async function fetchCompletedSessions() {
+            try {
+                const response = await fetch(`${backendUrl}/api/tasks/completed-sessions`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                });
+
+                const container = document.getElementById("completedSessionsContainer");
+
+                if (response.ok) {
+                    const tasks = await response.json();
+                    container.innerHTML = ""; // Clear loading message
+
+                    if (tasks.length > 0) {
+                        tasks.forEach((task) => {
+                            const taskCard = `
+                                <div class="task-card">
+                                    <h5>${task.title}</h5>
+                                    <p>${task.description}</p>
+                                    <p><strong>Created:</strong> ${new Date(task.time_created).toLocaleString()}</p>
+                                    <p><strong>Completed:</strong> ${new Date(task.time_updated).toLocaleString()}</p>
+                                </div>
+                            `;
+                            container.innerHTML += taskCard;
+                        });
+                    } else {
+                        container.innerHTML = "<p>No completed sessions at the moment.</p>";
+                    }
+                } else {
+                    console.error("Failed to fetch completed sessions.");
+                    container.innerHTML = "<p>Could not load completed sessions. Please try again later.</p>";
+                }
+            } catch (err) {
+                console.error("Error fetching completed sessions:", err);
+                document.getElementById("completedSessionsContainer").innerHTML =
+                    "<p>Error connecting to the backend. Please try again later.</p>";
+            }
+        }
+
+        // Fetch completed sessions on page load
+        window.onload = fetchCompletedSessions;
+    </script>
 </body>
 </html>

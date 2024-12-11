@@ -95,6 +95,22 @@ class Task {
             callback(null, rows);
         });
     };
+
+    static getCompletedSessions(seniorId, callback) {
+        const sql = `
+            SELECT *
+            FROM Tasks
+            WHERE accept_id = ? AND status = 'completed'
+            ORDER BY time_updated DESC
+        `;
+        db.all(sql, [seniorId], (err, rows) => {
+            if (err) {
+                console.error("Error fetching completed sessions:", err.message);
+                return callback(err, null);
+            }
+            callback(null, rows);
+        });
+    }
     
 }
 

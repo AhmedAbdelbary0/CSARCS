@@ -118,8 +118,9 @@
                 <p><strong>Junior Student:</strong> John Doe</p>
                 <p><strong>Subject:</strong> Math</p>
                 <p><strong>Progress Status:</strong> In Progress</p>
-                <button class="btn btn-primary">View Details</button>
-                <button class="btn btn-danger">End Session</button>
+                <button class="btn btn-primary view-details" data-subject="Math" data-time="2:00 PM - 3:00 PM" data-date="2024-12-10">View Details</button>
+
+                <button class="btn btn-danger end-session" data-id="1">End Session</button>
             </div>
         </div>
 
@@ -130,7 +131,8 @@
                 <p><strong>Junior Student:</strong> Sarah Connor</p>
                 <p><strong>Subject:</strong> Science</p>
                 <p><strong>Progress Status:</strong> Completed</p>
-                <button class="btn btn-primary">View Details</button>
+                <button class="btn btn-primary view-details" data-subject="Math" data-time="2:00 PM - 3:00 PM" data-date="2024-12-10">View Details</button>
+
             </div>
         </div>
 
@@ -145,15 +147,38 @@
     </div>
 
     <script>
+        // Function to switch between pages
         function showPage(pageId) {
-            // Hide all content areas
             const pages = document.querySelectorAll('.content-area');
             pages.forEach(page => page.classList.remove('active'));
-
-            // Show the selected content area
             const selectedPage = document.getElementById(pageId);
             selectedPage.classList.add('active');
         }
+
+        // Event listeners for "View Details" buttons
+        document.querySelectorAll('.view-details').forEach(button => {
+            button.addEventListener('click', function () {
+                // Get data attributes from the button
+                const subject = this.getAttribute('data-subject');
+                const time = this.getAttribute('data-time');
+                const date = this.getAttribute('data-date');
+        
+                // Display the information in an alert (or replace this with modal if needed)
+                alert(`Session Details:\n\nSubject: ${subject}\nDate: ${date}\nTime: ${time}`);
+            });
+        });
+        
+        // Event listeners for "End Session" buttons
+        document.querySelectorAll('.end-session').forEach(button => {
+            button.addEventListener('click', function () {
+                const sessionId = this.getAttribute('data-id');
+                const confirmation = confirm(`Are you sure you want to end session ID: ${sessionId}?`);
+                if (confirmation) {
+                    alert(`Session ID: ${sessionId} has been ended.`);
+                    // Add logic to handle session ending
+                }
+            });
+        });
     </script>
 </body>
 </html>

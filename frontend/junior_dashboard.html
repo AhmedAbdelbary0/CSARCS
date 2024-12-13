@@ -6,7 +6,6 @@
     <title>Junior Dashboard</title>
     <link rel="stylesheet" href="../css/style.css">
     <style>
-        
         html, body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f9;
@@ -18,7 +17,7 @@
             justify-content: center;
             align-items: center;
         }
-    
+
         .dashboard {
             width: 90%;
             max-width: 1200px;
@@ -33,14 +32,14 @@
             justify-content: flex-start;
             align-items: center;
         }
-    
+
         h1 {
             text-align: center;
             margin-bottom: 30px;
             color: #333;
             font-size: 48px;
         }
-    
+
         .profile-card {
             background-color: #3d3d3d;
             color: white;
@@ -52,7 +51,7 @@
             margin-bottom: 30px;
             font-size: 24px;
         }
-    
+
         .profile-card .circle {
             width: 120px;
             height: 120px;
@@ -60,12 +59,11 @@
             background-color: #bbb;
             border-radius: 50%;
         }
-    
+
         .profile-card p {
             margin: 15px 0;
         }
-    
-        
+
         .button {
             display: inline-block;
             width: 100%;
@@ -83,12 +81,11 @@
             font-weight: bold;
             transition: background-color 0.3s ease;
         }
-    
+
         .button:hover {
             background-color: #20B2AA; 
         }
-    
-        
+
         .requests {
             font-size: 20px; 
             margin-bottom: 20px;
@@ -96,8 +93,7 @@
             width: 100%;
             max-width: 500px;
         }
-    
-        
+
         .confirmation {
             margin-top: 20px;
             padding: 20px;
@@ -111,11 +107,9 @@
             width: 100%;
         }
     </style>
-    
-    
-    
+
     <script>
-        const backendUrl = "http://localhost:3000"; // Update with your backend URL
+        const backendUrl = "http://localhost:3000"; // Backend base URL
         const token = localStorage.getItem("token"); // Retrieve token from localStorage
 
         // Redirect to login if no token is found
@@ -123,6 +117,7 @@
             console.error("No token found. Redirecting to login.");
             window.location.href = "index.html";
         }
+
         // Fetch and display user details
         async function fetchUserDetails() {
             try {
@@ -152,6 +147,8 @@
                 window.location.href = "index.html";
             }
         }
+
+        // Fetch and display requests made by the user
         async function fetchUserRequests() {
             try {
                 const response = await fetch(`${backendUrl}/api/tasks/my-requests`, {
@@ -162,7 +159,7 @@
                     },
                 });
 
-                const container = document.querySelector(".requests ul");
+                const container = document.getElementById("requestsList");
 
                 if (response.ok) {
                     const requests = await response.json();
@@ -187,9 +184,10 @@
                 }
             } catch (err) {
                 console.error("Error fetching user requests:", err);
-                document.querySelector(".requests ul").innerHTML = "<li>Error connecting to the backend.</li>";
+                document.getElementById("requestsList").innerHTML = "<li>Error connecting to the backend.</li>";
             }
         }
+
         // Show the confirmation message if redirected back from the request page
         function showConfirmationOnReturn() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -216,7 +214,6 @@
             <p><strong>ID:</strong> Loading...</p>
         </div>
         
-        
         <h3>Active Requests:</h3>
         <div class="requests">
             <ul id="requestsList">
@@ -226,7 +223,7 @@
         <a href="request_assistance.html" class="button">Request New Assistance</a>
         
         <!-- Confirmation Section -->
-        <div id="confirmationMessage" class="confirmation">
+        <div id="confirmationMessage" class="confirmation" style="display: none;">
             <p><strong>Confirmation:</strong> Your request has been submitted successfully!</p>
         </div>
     </div>

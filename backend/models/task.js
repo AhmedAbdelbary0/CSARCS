@@ -35,6 +35,19 @@ class Task {
         });
     }
 
+    static getByRequestId(requestId, callback) {
+        const sql = `
+            SELECT *
+            FROM Tasks
+            WHERE request_id = ? AND status IN ('open', 'assigned')
+            ORDER BY time_created DESC
+        `;
+        db.all(sql, [requestId], (err, rows) => {
+            callback(err, rows);
+        });
+    }
+    
+
     static updateStatus(id, status, callback) {
         const sql = `
             UPDATE Tasks

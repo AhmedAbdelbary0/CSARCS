@@ -64,22 +64,16 @@ router.post(
     [
         body('title').isString().trim().notEmpty().withMessage('Title is required'),
         body('status').isIn(['open', 'in_progress', 'completed']).withMessage('Invalid status'),
-        body('request_id').isInt().withMessage('Request ID must be an integer'),
     ],
     handleValidationErrors,
     async (req, res, next) => {
         try {
-            const { title, description, status, request_id } = req.body;
+            const { title, description, status } = req.body;
+            const request_id = req.user.id; // Use logged-in user's ID
 
             const taskId = await new Promise((resolve, reject) =>
                 Task.create(title, description, status, request_id, null, (err, id) => (err ? reject(err) : resolve(id)))
             );
-
-            // Notify senior users
-            const message = `A new task titled "${title}" has been created.`;
-            Notification.create(request_id, message, (err) => {
-                if (err) console.error('Error creating notification:', err.message);
-            });
 
             res.status(201).json({ message: 'Task created successfully', id: taskId });
         } catch (err) {
@@ -87,6 +81,8 @@ router.post(
         }
     }
 );
+
+
 // Route to fetch tasks assigned to the logged-in user
 router.get(
     '/active-sessions',
@@ -130,6 +126,25 @@ router.get(
         }
     }
 );
+
+// Route to fetch tasks created by the logged-in user
+router.get('/my-requests', authenticateToken, async (req, res, next) => {
+    try {
+        const userId = req.user.id; // Get logged-in user's ID
+        const tasks = await new Promise((resolve, reject) =>
+            Task.getByRequestId(userId, (err, tasks) => (err ? reject(err) : resolve(tasks)))
+        );
+
+        if (!tasks || tasks.length === 0) {
+            return res.status(404).json({ message: 'No tasks found.' });
+        }
+
+        res.status(200).json(tasks);
+    } catch (err) {
+        next(err);
+    }
+});
+
 
 // Route to fetch a task by ID
 router.get(

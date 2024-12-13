@@ -6,7 +6,6 @@
     <title>Junior Dashboard</title>
     <link rel="stylesheet" href="../css/style.css">
     <style>
-        
         html, body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f9;
@@ -18,7 +17,7 @@
             justify-content: center;
             align-items: center;
         }
-    
+
         .dashboard {
             width: 90%;
             max-width: 1200px;
@@ -33,14 +32,14 @@
             justify-content: flex-start;
             align-items: center;
         }
-    
+
         h1 {
             text-align: center;
             margin-bottom: 30px;
             color: #333;
             font-size: 48px;
         }
-    
+
         .profile-card {
             background-color: #3d3d3d;
             color: white;
@@ -52,7 +51,7 @@
             margin-bottom: 30px;
             font-size: 24px;
         }
-    
+
         .profile-card .circle {
             width: 120px;
             height: 120px;
@@ -60,12 +59,11 @@
             background-color: #bbb;
             border-radius: 50%;
         }
-    
+
         .profile-card p {
             margin: 15px 0;
         }
-    
-        
+
         .button {
             display: inline-block;
             width: 100%;
@@ -83,11 +81,11 @@
             font-weight: bold;
             transition: background-color 0.3s ease;
         }
-    
+
         .button:hover {
             background-color: #0056b3; 
         }
-        
+
         .requests {
             font-size: 20px; 
             margin-bottom: 20px;
@@ -95,8 +93,7 @@
             width: 100%;
             max-width: 500px;
         }
-    
-        
+
         .confirmation {
             margin-top: 20px;
             padding: 20px;
@@ -110,9 +107,7 @@
             width: 100%;
         }
     </style>
-    
-    
-    
+
     <script>
         const backendUrl = "http://localhost:3000"; // Update with your backend URL
         const token = localStorage.getItem("token"); // Retrieve token from localStorage
@@ -122,6 +117,7 @@
             console.error("No token found. Redirecting to login.");
             window.location.href = "index.html";
         }
+
         // Fetch and display user details
         async function fetchUserDetails() {
             try {
@@ -140,8 +136,7 @@
                     document.querySelector(".profile-card p:nth-child(2)").innerHTML = `<strong>Name:</strong> ${user.username}`;
                     document.querySelector(".profile-card p:nth-child(3)").innerHTML = `<strong>ID:</strong> ${user.id}`;
                 } else {
-                    const error = await response.json();
-                    console.error("Failed to fetch user details:", error);
+                    console.error("Failed to fetch user details.");
                     alert("Session expired. Please log in again.");
                     window.location.href = "index.html";
                 }
@@ -151,24 +146,65 @@
                 window.location.href = "index.html";
             }
         }
-        // Show the confirmation message if redirected back from the request page
-        function showConfirmationOnReturn() {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('confirmation') === 'true') {
-                document.getElementById('confirmationMessage').style.display = 'block';
+
+        // Fetch and display user's active requests
+        async function fetchUserRequests() {
+            try {
+                const response = await fetch(`${backendUrl}/api/tasks/my-requests`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                });
+
+                // Log the response to debug
+                console.log("Fetch Response:", response);
+
+                const requestsContainer = document.querySelector(".requests ul");
+
+                if (response.ok) {
+                    const requests = await response.json();
+                    console.log("Fetched Requests:", requests);
+
+                    requestsContainer.innerHTML = ""; // Clear existing requests
+
+                    if (requests.length > 0) {
+                        requests.forEach((request) => {
+                            const requestItem = `
+                                <li>
+                                    <strong>${request.title}</strong> - ${request.status} <br>
+                                    <small>Created: ${new Date(request.time_created).toLocaleString()}</small>
+                                </li>
+                            `;
+                            requestsContainer.innerHTML += requestItem;
+                        });
+                    } else {
+                        requestsContainer.innerHTML = "<li>No active requests found.</li>";
+                    }
+                } else {
+                    const error = await response.json();
+                    console.error("Error Fetching Requests:", error);
+                    requestsContainer.innerHTML = "<li>Could not load requests. Please try again later.</li>";
+                }
+            } catch (err) {
+                console.error("Error Fetching Requests:", err);
+                document.querySelector(".requests ul").innerHTML = "<li>Error connecting to the backend.</li>";
             }
         }
 
-        window.onload = () => {
+         // Execute functions on page load
+         window.onload = () => {
             fetchUserDetails();
-            showConfirmationOnReturn();
+            fetchUserRequests();
         };
+
     </script>
 </head>
 <body>
     <div class="dashboard">
-
         <h1>Welcome, Junior Student</h1>
+
         <!-- User Information -->
         <div class="profile-card">
             <div class="circle"></div>
@@ -176,16 +212,16 @@
             <p><strong>ID:</strong> Loading...</p>
         </div>
         
-        
         <h3>Active Requests:</h3>
-        <ul>
-            <li>Request 1...</li>
-            <li>Request 2...</li>
-        </ul>
+        <div class="requests">
+            <ul>
+                <li>Loading requests...</li>
+            </ul>
+        </div>
         <a href="request_assistance.html" class="button">Request New Assistance</a>
         
         <!-- Confirmation Section -->
-        <div id="confirmationMessage" class="confirmation">
+        <div id="confirmationMessage" class="confirmation" style="display: none;">
             <p><strong>Confirmation:</strong> Your request has been submitted successfully!</p>
         </div>
     </div>

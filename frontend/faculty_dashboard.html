@@ -22,31 +22,55 @@
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: space-between;
         }
         .side-menu {
-            width: 30%;
+            width: 100%;
             padding: 10px;
             background-color: #f0f0f0;
             border-radius: 8px;
             text-align: center;
+            margin-bottom: 20px;
+        }
+        .profile-card {
+            background-color: #343a40;
+            color: white;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .profile-card img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 10px;
         }
         .side-menu .btn {
-            display: block;
-            margin: 10px 0;
-            background-color: #007bff;
+            display: inline-block;
+            width: 100%;
+            max-width: 400px; 
+            padding: 16px; 
+            margin: 20px 0;
+            text-align: center;
+            background-color: #40E0D0; 
             color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
             text-decoration: none;
-            border-radius: 5px;
-            padding: 10px;
+            font-size: 22px; /* تكبير النص في الأزرار */
+            font-weight: bold;
+            transition: background-color 0.3s ease;
         }
+        
         .side-menu .btn:hover {
             background-color: #0056b3;
         }
         .content-area {
-            width: 65%;
-            padding: 10px;
+            display: none;
+        }
+        .content-area.active {
+            display: block;
         }
         .request-item {
             background-color: #e9ecef;
@@ -72,91 +96,89 @@
 </head>
 <body>
     <div class="dashboard-container">
+        <!-- Profile Card -->
+        <div class="profile-card">
+            <img src="https://via.placeholder.com/80" alt="User Profile">
+            <h3>John Doe</h3>
+            <p>ID: 123456</p>
+        </div>
+
         <!-- Side Menu -->
         <div class="side-menu">
-            <div class="profile-card bg-dark text-white rounded p-4 mb-4 text-center">
-                <img src="https://via.placeholder.com/80" alt="User Profile" 
-                     class="rounded-circle mx-auto d-block mb-3" style="width: 80px; height: 80px;">
-                <h3 class="mt-3">John Doe</h3>
-                <p>ID: 123456</p>
-            </div>
-            <a href="#" class="btn">Active Sessions</a>
-            <a href="#" class="btn">Completed Sessions</a>
-            <a href="#" class="btn">Credits Overview</a>
+            <button class="btn" onclick="showPage('active-sessions')">Active Sessions</button>
+            <button class="btn" onclick="showPage('completed-sessions')">Completed Sessions</button>
+            <button class="btn" onclick="showPage('credits-overview')">Credits Overview</button>
         </div>
 
         <!-- Content Area -->
-        <div class="content-area">
-            <h2>Session Requests</h2>
+        <div id="active-sessions" class="content-area active">
+            <h2>Active Sessions</h2>
             <div class="request-item">
                 <p><strong>Mentor's Name:</strong> Jane Smith</p>
                 <p><strong>Junior Student:</strong> John Doe</p>
                 <p><strong>Subject:</strong> Math</p>
                 <p><strong>Progress Status:</strong> In Progress</p>
-                <button class="btn btn-primary">View Details</button>
-                <button class="btn btn-danger">End Session</button>
+                <button class="btn btn-primary view-details" data-subject="Math" data-time="2:00 PM - 3:00 PM" data-date="2024-12-10">View Details</button>
+
+                <button class="btn btn-danger end-session" data-id="1">End Session</button>
             </div>
+        </div>
+
+        <div id="completed-sessions" class="content-area">
+            <h2>Completed Sessions</h2>
             <div class="request-item">
                 <p><strong>Mentor's Name:</strong> Alex Johnson</p>
                 <p><strong>Junior Student:</strong> Sarah Connor</p>
                 <p><strong>Subject:</strong> Science</p>
                 <p><strong>Progress Status:</strong> Completed</p>
-                <button class="btn btn-primary">View Details</button>
-                <button class="btn btn-danger">End Session</button>
-            </div>
+                <button class="btn btn-primary view-details" data-subject="Math" data-time="2:00 PM - 3:00 PM" data-date="2024-12-10">View Details</button>
 
+            </div>
+        </div>
+
+        <div id="credits-overview" class="content-area">
+            <h2>Credits Overview</h2>
             <div class="rating-section">
-                <h4>Credits successfully awarded to the mentor!</h4>
                 <p><strong>Mentor's Name:</strong> Alex Johnson</p>
                 <p><strong>Subject:</strong> Science</p>
                 <span>⭐⭐⭐⭐⭐</span>
             </div>
         </div>
     </div>
-    
+
     <script>
-        const backendUrl = "http://localhost:3000"; // Backend base URL
-        const token = localStorage.getItem("token"); // Retrieve the token from localStorage
-    
-        // Redirect to login if no token is found
-        if (!token) {
-            console.error("No token found. Redirecting to login.");
-            window.location.href = "index.html";
+        // Function to switch between pages
+        function showPage(pageId) {
+            const pages = document.querySelectorAll('.content-area');
+            pages.forEach(page => page.classList.remove('active'));
+            const selectedPage = document.getElementById(pageId);
+            selectedPage.classList.add('active');
         }
-    
-        // Fetch and display user details
-        async function fetchUserDetails() {
-            try {
-                const response = await fetch(`${backendUrl}/api/auth/me`, {
-                    method: "GET",
-                    headers: {
-                        "Authorization": `Bearer ${token}`,
-                    },
-                });
-    
-                if (response.ok) {
-                    const user = await response.json();
-                    console.log("User Details:", user);
-    
-                    // Update profile card dynamically
-                    document.querySelector(".profile-card h3").innerText = user.username;
-                    document.querySelector(".profile-card p").innerText = `ID: ${user.id}`;
-                } else {
-                    const error = await response.json();
-                    console.error("Failed to fetch user details:", error);
-                    alert("Session expired. Please log in again.");
-                    window.location.href = "index.html";
+
+        // Event listeners for "View Details" buttons
+        document.querySelectorAll('.view-details').forEach(button => {
+            button.addEventListener('click', function () {
+                // Get data attributes from the button
+                const subject = this.getAttribute('data-subject');
+                const time = this.getAttribute('data-time');
+                const date = this.getAttribute('data-date');
+        
+                // Display the information in an alert (or replace this with modal if needed)
+                alert(`Session Details:\n\nSubject: ${subject}\nDate: ${date}\nTime: ${time}`);
+            });
+        });
+        
+        // Event listeners for "End Session" buttons
+        document.querySelectorAll('.end-session').forEach(button => {
+            button.addEventListener('click', function () {
+                const sessionId = this.getAttribute('data-id');
+                const confirmation = confirm(`Are you sure you want to end session ID: ${sessionId}?`);
+                if (confirmation) {
+                    alert(`Session ID: ${sessionId} has been ended.`);
+                    // Add logic to handle session ending
                 }
-            } catch (err) {
-                console.error("Error fetching user details:", err);
-                alert("Could not connect to the backend. Please try again later.");
-                window.location.href = "index.html";
-            }
-        }
-    
-        // Call the function when the page loads
-        window.onload = fetchUserDetails;
+            });
+        });
     </script>
-    
 </body>
 </html>

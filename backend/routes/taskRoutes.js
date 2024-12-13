@@ -58,7 +58,7 @@ router.get(
 
 // Route to create a new task
 router.post(
-    '/',
+    '/create',
     authenticateToken,
     roleMiddleware(['junior']),
     [
@@ -130,6 +130,28 @@ router.get(
         }
     }
 );
+
+// Route to fetch tasks created by the logged-in user
+router.get(
+    '/my-requests',
+    authenticateToken,
+    roleMiddleware(['junior']),
+    async (req, res, next) => {
+        try {
+            const requestId = req.user.id; // Extract user ID from the token
+
+            const tasks = await new Promise((resolve, reject) =>
+                Task.getRequestsByUser(requestId, (err, tasks) => (err ? reject(err) : resolve(tasks)))
+            );
+
+            res.status(200).json(tasks);
+        } catch (err) {
+            console.error("Error fetching user requests:", err.message);
+            next(err);
+        }
+    }
+);
+
 
 // Route to fetch a task by ID
 router.get(

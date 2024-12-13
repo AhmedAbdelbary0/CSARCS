@@ -33,15 +33,48 @@
     <!-- Bootstrap JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function handleFormSubmission(event) {
+        const backendUrl = "http://localhost:3000"; // Backend base URL
+        const token = localStorage.getItem("token"); // Retrieve token from localStorage
+    
+        async function handleFormSubmission(event) {
             event.preventDefault(); // Prevent the default form submission behavior
-            
-            // Simulate request submission logic
-            console.log("Request submitted successfully!");
-
-            // Redirect to the dashboard with confirmation parameter
-            window.location.href = "junior_dashboard.html?confirmation=true";
+    
+            const title = document.getElementById("title").value.trim();
+            const subject = document.getElementById("subject").value.trim();
+            const details = document.getElementById("details").value.trim();
+    
+            try {
+                const response = await fetch(`${backendUrl}/api/tasks/create`, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        title: title,
+                        subject: subject,
+                        details: details,
+                    }),
+                });
+    
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log("Request created successfully:", data);
+                    alert("Your request has been submitted successfully!");
+    
+                    // Redirect to the dashboard with a confirmation parameter
+                    window.location.href = "junior_dashboard.html?confirmation=true";
+                } else {
+                    const error = await response.json();
+                    console.error("Error creating request:", error);
+                    alert("Failed to submit the request: " + error.message);
+                }
+            } catch (err) {
+                console.error("Error connecting to backend:", err);
+                alert("Could not connect to the backend. Please try again later.");
+            }
         }
     </script>
+    
 </body>
 </html>

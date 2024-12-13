@@ -4,7 +4,7 @@ class Task {
     static create(title, description, status, request_id, accept_id, callback) {
         const sql = `
             INSERT INTO Tasks (title, description, status, request_id, accept_id, time_created)
-            VALUES (?, ?, ?, ?, ?, datetime('now'))
+            VALUES (?, ?, 'open', ?, ?, datetime('now'))
         `;
         db.run(sql, [title, description, status, request_id, accept_id], function (err) {
             callback(err, this?.lastID);
@@ -94,7 +94,7 @@ class Task {
             }
             callback(null, rows);
         });
-    };
+    }
 
     static getCompletedSessions(seniorId, callback) {
         const sql = `
@@ -106,6 +106,22 @@ class Task {
         db.all(sql, [seniorId], (err, rows) => {
             if (err) {
                 console.error("Error fetching completed sessions:", err.message);
+                return callback(err, null);
+            }
+            callback(null, rows);
+        });
+    }
+    
+    static getRequestsByUser(userId, callback){
+        const sql = `
+            SELECT id, title, description, status, time_created, time_updated
+            FROM Tasks
+            WHERE request_id = ?
+            ORDER BY time_created DESC
+        `;
+        db.all(sql, [userId], (err, rows) => {
+            if (err) {
+                console.error("Error fetching user requests:", err.message);
                 return callback(err, null);
             }
             callback(null, rows);

@@ -152,6 +152,44 @@
                 window.location.href = "index.html";
             }
         }
+        async function fetchUserRequests() {
+            try {
+                const response = await fetch(`${backendUrl}/api/tasks/my-requests`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                });
+
+                const container = document.querySelector(".requests ul");
+
+                if (response.ok) {
+                    const requests = await response.json();
+                    container.innerHTML = ""; // Clear existing requests
+
+                    if (requests.length > 0) {
+                        requests.forEach((request) => {
+                            const requestItem = `
+                                <li>
+                                    <strong>${request.title}</strong> - ${request.status} <br>
+                                    <small>Created: ${new Date(request.time_created).toLocaleString()}</small>
+                                </li>
+                            `;
+                            container.innerHTML += requestItem;
+                        });
+                    } else {
+                        container.innerHTML = "<li>No requests found.</li>";
+                    }
+                } else {
+                    console.error("Failed to fetch user requests.");
+                    container.innerHTML = "<li>Could not load requests. Please try again later.</li>";
+                }
+            } catch (err) {
+                console.error("Error fetching user requests:", err);
+                document.querySelector(".requests ul").innerHTML = "<li>Error connecting to the backend.</li>";
+            }
+        }
         // Show the confirmation message if redirected back from the request page
         function showConfirmationOnReturn() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -162,6 +200,7 @@
 
         window.onload = () => {
             fetchUserDetails();
+            fetchUserRequests();
             showConfirmationOnReturn();
         };
     </script>
@@ -179,10 +218,11 @@
         
         
         <h3>Active Requests:</h3>
-        <ul>
-            <li>Request 1...</li>
-            <li>Request 2...</li>
-        </ul>
+        <div class="requests">
+            <ul id="requestsList">
+                <li>Loading requests...</li>
+            </ul>
+        </div>
         <a href="request_assistance.html" class="button">Request New Assistance</a>
         
         <!-- Confirmation Section -->

@@ -47,6 +47,13 @@ class Task {
         });
     }
     
+    static getSeniorDetailsById(seniorId, callback) {
+        const sql = `SELECT id, username, email FROM Users WHERE id = ?`;
+        db.get(sql, [seniorId], (err, row) => {
+            callback(err, row);
+        });
+    }
+    
 
     static updateStatus(id, status, callback) {
         const sql = `

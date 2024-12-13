@@ -106,6 +106,52 @@
             max-width: 500px;
             width: 100%;
         }
+
+        .details-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 10px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        /* Hover Effect */
+        .details-button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+
+        /* Focus State for Accessibility */
+        .details-button:focus {
+            outline: 3px solid #80bdff;
+            outline-offset: 2px;
+        }
+
+        /* Active State */
+        .details-button:active {
+            background-color: #004080;
+            transform: scale(0.95);
+        }
+
+        /* Styling for Details Section */
+        .details-section {
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .details-section strong {
+            color: #007bff;
+        }
     </style>
 
     <script>
@@ -158,15 +204,10 @@
                     },
                 });
 
-                // Log the response to debug
-                console.log("Fetch Response:", response);
-
                 const requestsContainer = document.querySelector(".requests ul");
 
                 if (response.ok) {
                     const requests = await response.json();
-                    console.log("Fetched Requests:", requests);
-
                     requestsContainer.innerHTML = ""; // Clear existing requests
 
                     if (requests.length > 0) {
@@ -175,6 +216,10 @@
                                 <li>
                                     <strong>${request.title}</strong> - ${request.status} <br>
                                     <small>Created: ${new Date(request.time_created).toLocaleString()}</small>
+                                    ${request.status === 'assigned' ? `
+                                        <button onclick="showSeniorDetails(${request.id})">Show Details</button>
+                                        <div id="senior-details-${request.id}" style="display: none; margin-top: 10px;"></div>
+                                    ` : ''}
                                 </li>
                             `;
                             requestsContainer.innerHTML += requestItem;
@@ -192,6 +237,42 @@
                 document.querySelector(".requests ul").innerHTML = "<li>Error connecting to the backend.</li>";
             }
         }
+
+        async function showSeniorDetails(taskId) {
+            const detailsDiv = document.getElementById(`senior-details-${taskId}`);
+            if (detailsDiv.style.display === 'block') {
+                detailsDiv.style.display = 'none'; // Hide details if already visible
+                return;
+            }
+
+            try {
+                const response = await fetch(`${backendUrl}/api/tasks/${taskId}/senior-details`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                    },
+                });
+
+                if (response.ok) {
+                    const senior = await response.json();
+                    detailsDiv.innerHTML = `
+                        <strong>Senior Details:</strong><br>
+                        Name: ${senior.username}<br>
+                        ID: ${senior.id}<br>
+                        Email: ${senior.email}
+                    `;
+                    detailsDiv.style.display = 'block';
+                } else {
+                    const error = await response.json();
+                    console.error("Error fetching senior details:", error);
+                    alert("Could not fetch senior details. Please try again later.");
+                }
+            } catch (err) {
+                console.error("Error fetching senior details:", err);
+                alert("Could not connect to the backend. Please try again later.");
+            }
+        }
+
 
          // Execute functions on page load
          window.onload = () => {

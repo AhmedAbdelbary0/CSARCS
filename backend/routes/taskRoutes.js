@@ -146,6 +146,42 @@ router.get('/my-requests', authenticateToken, async (req, res, next) => {
 });
 
 
+//route to fetch the senior details of an assigned task
+router.get(
+    '/:id/senior-details',
+    authenticateToken,
+    async (req, res, next) => {
+        try {
+            const taskId = parseInt(req.params.id, 10);
+
+            // Get the task details
+            const task = await new Promise((resolve, reject) =>
+                Task.findById(taskId, (err, task) => (err ? reject(err) : resolve(task)))
+            );
+
+            if (!task || !task.accept_id) {
+                return res.status(404).json({ message: 'Task not found or not assigned' });
+            }
+
+            // Fetch senior details
+            const seniorDetails = await new Promise((resolve, reject) =>
+                Task.getSeniorDetailsById(task.accept_id, (err, senior) => (err ? reject(err) : resolve(senior)))
+            );
+
+            if (!seniorDetails) {
+                return res.status(404).json({ message: 'Senior not found' });
+            }
+
+            res.status(200).json(seniorDetails);
+        } catch (err) {
+            console.error('Error fetching senior details:', err);
+            next(err);
+        }
+    }
+);
+
+
+
 // Route to fetch a task by ID
 router.get(
     '/:id',

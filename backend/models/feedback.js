@@ -18,13 +18,18 @@ class Feedback {
         });
     }
 
-    static getByTaskId(task_id, callback) {
-        const sql = `SELECT * FROM Feedback WHERE task_id = ?`;
-        db.all(sql, [task_id], (err, rows) => {
+    static getByTaskId(taskId, callback) {
+        const sql = `
+            SELECT Feedback.rating, Feedback.comments, Users.username AS reviewer
+            FROM Feedback
+            INNER JOIN Users ON Feedback.user_id = Users.id
+            WHERE Feedback.task_id = ?
+        `;
+        db.all(sql, [taskId], (err, rows) => {
             callback(err, rows);
         });
     }
-
+    
     static getByUserId(user_id, callback) {
         const sql = `SELECT * FROM Feedback WHERE user_id = ?`;
         db.all(sql, [user_id], (err, rows) => {

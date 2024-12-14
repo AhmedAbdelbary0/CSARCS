@@ -6,6 +6,7 @@ const Notification = require('../models/notification');
 const { authenticateToken } = require('../middleware/authMiddleware');
 const roleMiddleware = require('../middleware/roleMiddleware');
 const User = require('../models/user'); // Adjust the path based on your project structure
+const Feedback = require('../models/feedback'); // Adjust the path if necessary
 
 const AppError = require('../utils/AppError'); // Import custom AppError
 
@@ -166,6 +167,52 @@ router.get(
         }
     }
 );
+
+// Route to fetch completed sessions for faculty
+router.get(
+    '/faculty-completed-sessions',
+    authenticateToken,
+    roleMiddleware(['faculty']),
+    async (req, res, next) => {
+        try {
+            const tasks = await new Promise((resolve, reject) =>
+                Task.getByStatus('completed', (err, tasks) => (err ? reject(err) : resolve(tasks)))
+            );
+
+            const tasksWithDetails = await Promise.all(
+                tasks.map(async (task) => {
+                    const junior = await new Promise((resolve, reject) =>
+                        User.getById(task.request_id, (err, user) => (err ? reject(err) : resolve(user)))
+                    );
+
+                    const senior = await new Promise((resolve, reject) =>
+                        User.getById(task.accept_id, (err, user) => (err ? reject(err) : resolve(user)))
+                    );
+
+                    const feedback = await new Promise((resolve, reject) =>
+                        Feedback.getByTaskId(task.id, (err, feedback) => (err ? reject(err) : resolve(feedback)))
+                    );
+
+                    return {
+                        ...task,
+                        junior_name: junior?.username || "Unknown",
+                        senior_name: senior?.username || "Unknown",
+                        feedback: feedback || [],
+                    };
+                })
+            );
+
+            res.status(200).json(tasksWithDetails);
+        } catch (err) {
+            console.error("Error fetching completed sessions:", err);
+            next(err);
+        }
+    }
+);
+
+
+
+
 
 // Route to fetch tasks created by the logged-in user
 router.get('/my-requests', authenticateToken, async (req, res, next) => {

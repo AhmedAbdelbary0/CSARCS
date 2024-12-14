@@ -21,6 +21,14 @@ class Task {
         });
     }
 
+    static getByStatus(status, callback) {
+        const sql = `SELECT * FROM Tasks WHERE status = ? ORDER BY time_updated DESC`;
+        db.all(sql, [status], (err, rows) => {
+            callback(err, rows);
+        });
+    }
+    
+
     static getAll(callback) {
         const sql = `SELECT * FROM Tasks`;
         db.all(sql, [], (err, rows) => {

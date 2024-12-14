@@ -21,6 +21,20 @@ class Task {
         });
     }
 
+    static approve(taskId, callback) {
+    const sql = `UPDATE Tasks SET status = 'approved', time_updated = CURRENT_TIMESTAMP WHERE id = ? AND status = 'completed'`;
+    db.run(sql, [taskId], function (err) {
+        if (err) {
+            return callback(err);
+        }
+        if (this.changes === 0) {
+            return callback(new Error('Task not found or not in a completed state.'));
+        }
+        callback(null);
+    });
+    }
+
+
     static getByStatus(status, callback) {
         const sql = `SELECT * FROM Tasks WHERE status = ? ORDER BY time_updated DESC`;
         db.all(sql, [status], (err, rows) => {

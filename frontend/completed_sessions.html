@@ -93,6 +93,7 @@
                                     <p><strong>Senior:</strong> ${task.senior_name || "Unknown"}</p>
                                     <h4>Feedback:</h4>
                                     <div>${feedbackHtml}</div>
+                                    <button class="btn btn-success" onclick="approveTask(${task.id})">Approve Task</button>
                                 </div>
                             `;
                             container.innerHTML += taskCard;
@@ -111,6 +112,33 @@
                     "<p>Error connecting to the backend. Please try again later.</p>";
             }
         }
+
+        async function approveTask(taskId) {
+            const confirmApproval = confirm(`Are you sure you want to approve task ID: ${taskId}?`);
+            if (!confirmApproval) return;
+
+            try {
+                const response = await fetch(`${backendUrl}/api/tasks/${taskId}/approve`, {
+                    method: "PATCH",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                });
+
+                if (response.ok) {
+                    alert("Task approved successfully!");
+                    fetchCompletedSessions(); // Refresh the list
+                } else {
+                    const error = await response.json();
+                    alert(`Error approving task: ${error.message || "Unknown error"}`);
+                }
+            } catch (err) {
+                console.error("Error approving task:", err);
+                alert("Could not connect to the backend. Please try again later.");
+            }
+        }
+
 
 
 

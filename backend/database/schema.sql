@@ -10,7 +10,7 @@ CREATE TABLE Tasks (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   title TEXT NOT NULL,
   description TEXT,
-  status TEXT NOT NULL CHECK (status IN ('open', 'assigned', 'completed')),
+  status TEXT NOT NULL CHECK (status IN ('open', 'assigned', 'completed','approved')),
   request_id INTEGER NOT NULL REFERENCES Users(id),
   accept_id INTEGER REFERENCES Users(id),
   time_created DATETIME DEFAULT CURRENT_TIMESTAMP,

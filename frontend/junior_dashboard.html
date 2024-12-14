@@ -152,6 +152,38 @@
         .details-section strong {
             color: #007bff;
         }
+
+        /* Logout Button Styles */
+        .logout-button {
+            background-color: #dc3545;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        /* Hover Effect */
+        .logout-button:hover {
+            background-color: #c82333;
+            transform: scale(1.05);
+        }
+
+        /* Focus State for Accessibility */
+        .logout-button:focus {
+            outline: 3px solid #f5c6cb;
+            outline-offset: 2px;
+        }
+
+        /* Active State */
+        .logout-button:active {
+            background-color: #bd2130;
+            transform: scale(0.95);
+        }
+
     </style>
 
     <script>
@@ -217,8 +249,9 @@
                                     <strong>${request.title}</strong> - ${request.status} <br>
                                     <small>Created: ${new Date(request.time_created).toLocaleString()}</small>
                                     ${request.status === 'assigned' ? `
-                                        <button onclick="showSeniorDetails(${request.id})">Show Details</button>
+                                        <button onclick="showSeniorDetails(${request.id})" class="details-button">Show Details</button>
                                         <div id="senior-details-${request.id}" style="display: none; margin-top: 10px;"></div>
+                                        <button onclick="endSessionPrompt(${request.id})" class="details-button btn-danger">End Session</button>
                                     ` : ''}
                                 </li>
                             `;
@@ -237,6 +270,7 @@
                 document.querySelector(".requests ul").innerHTML = "<li>Error connecting to the backend.</li>";
             }
         }
+
 
         async function showSeniorDetails(taskId) {
             const detailsDiv = document.getElementById(`senior-details-${taskId}`);
@@ -273,21 +307,72 @@
             }
         }
 
+        async function endSessionPrompt(taskId) {
+            const feedback = prompt("Please provide your feedback for this session:");
+
+            if (feedback === null || feedback.trim() === "") {
+                alert("Feedback is required to end the session.");
+                return;
+            }
+
+            const rating = prompt("Please provide a rating for this session (1-5):");
+
+            if (!rating || isNaN(rating) || rating < 1 || rating > 5) {
+                alert("Please provide a valid rating between 1 and 5.");
+                return;
+            }
+
+            try {
+                const response = await fetch(`${backendUrl}/api/tasks/${taskId}/end-session`, {
+                    method: "PUT",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        feedback,
+                        rating: parseInt(rating, 10),
+                    }),
+                });
+
+                if (response.ok) {
+                    alert("Session ended successfully!");
+                    fetchUserRequests(); // Refresh the list of active requests
+                } else {
+                    const error = await response.json();
+                    console.error("Error ending session:", error);
+                    alert(`Could not end session: ${error.message || "Unknown error"}`);
+                }
+            } catch (err) {
+                console.error("Error ending session:", err);
+                alert("Could not connect to the backend. Please try again later.");
+            }
+        }
+
+
+
 
          // Execute functions on page load
          window.onload = () => {
             fetchUserDetails();
             fetchUserRequests();
+
+            // Attach the logout event listener after the DOM is fully loaded
+            const logoutButton = document.getElementById("logoutButton");
+            if (logoutButton) {
+                logoutButton.addEventListener("click", function () {
+                    const confirmLogout = confirm("Are you sure you want to log out?");
+                    if (confirmLogout) {
+                        localStorage.clear(); 
+                        sessionStorage.clear(); 
+                        alert("You have successfully logged out.");
+                        window.location.href = "index.html"; // Redirect to login page
+                    }
+                });
+            }
         };
 
-        document.getElementById("logoutButton").addEventListener("click", function () {
-            
-            localStorage.clear(); 
-            sessionStorage.clear(); 
-        
-            
-            window.location.href = "index.html";
-        });
+
         
 
     </script>
@@ -317,8 +402,9 @@
         </div>
 
         <div style="text-align: right; margin: 10px;">
-            <button id="logoutButton" class="btn btn-danger">Log Out</button>
+            <button id="logoutButton" class="logout-button">Log Out</button>
         </div>
+        
         
     </div>
 </body>

@@ -232,6 +232,46 @@ router.get('/my-requests', authenticateToken, async (req, res, next) => {
     }
 });
 
+router.put(
+    '/:taskId/end-session',
+    authenticateToken,
+    roleMiddleware(['junior']),
+    async (req, res, next) => {
+        try {
+            const taskId = parseInt(req.params.taskId, 10);
+            const { feedback, rating } = req.body;
+
+            // Validate inputs
+            if (!feedback || !rating || isNaN(rating) || rating < 1 || rating > 5) {
+                return res.status(400).json({ message: "Invalid feedback or rating." });
+            }
+
+            // Update task status to "completed"
+            const taskUpdated = await new Promise((resolve, reject) =>
+                Task.updateStatus(taskId, "completed", (err, changes) =>
+                    err ? reject(err) : resolve(changes)
+                )
+            );
+
+            if (taskUpdated === 0) {
+                return res.status(404).json({ message: "Task not found or already completed." });
+            }
+
+            // Save feedback
+            const feedbackSaved = await new Promise((resolve, reject) =>
+                Feedback.create(taskId, req.user.id, rating, feedback, (err, id) =>
+                    err ? reject(err) : resolve(id)
+                )
+            );
+
+            res.status(200).json({ message: "Session ended and feedback saved successfully." });
+        } catch (err) {
+            console.error("Error ending session:", err);
+            next(err);
+        }
+    }
+);
+
 
 //route to fetch the senior details of an assigned task
 router.get(

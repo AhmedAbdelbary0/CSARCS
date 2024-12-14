@@ -155,18 +155,28 @@ router.get(
         try {
             const seniorId = req.user.id; // Get logged-in user's ID from the token
 
-            // Fetch completed tasks assigned to the current user
+            // Fetch tasks with statuses 'completed' and 'approved' assigned to the current user
             const tasks = await new Promise((resolve, reject) =>
-                Task.getCompletedSessions(seniorId, (err, tasks) => (err ? reject(err) : resolve(tasks)))
+                Task.getSessionsByStatuses(seniorId, ['completed', 'approved'], (err, tasks) =>
+                    err ? reject(err) : resolve(tasks)
+                )
             );
 
-            res.status(200).json(tasks);
+            // Add is_approved field to indicate task status
+            const tasksWithApprovalFlag = tasks.map((task) => ({
+                ...task,
+                is_approved: task.status === 'approved', // Add true if the status is 'approved'
+            }));
+
+            res.status(200).json(tasksWithApprovalFlag);
         } catch (err) {
-            console.error("Error fetching completed sessions:", err.message);
+            console.error('Error fetching completed and approved sessions:', err.message);
             next(err);
         }
     }
 );
+
+
 
 // Route to fetch completed sessions for faculty
 router.get(

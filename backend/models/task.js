@@ -138,21 +138,19 @@ class Task {
         });
     };
 
-    static getCompletedSessions(seniorId, callback) {
+    static getSessionsByStatuses(seniorId, statuses, callback) {
+        const placeholders = statuses.map(() => '?').join(', '); // Create placeholders (?, ?, ...)
         const sql = `
-            SELECT *
-            FROM Tasks
-            WHERE accept_id = ? AND status = 'completed'
+            SELECT * 
+            FROM Tasks 
+            WHERE accept_id = ? AND status IN (${placeholders}) 
             ORDER BY time_updated DESC
         `;
-        db.all(sql, [seniorId], (err, rows) => {
-            if (err) {
-                console.error("Error fetching completed sessions:", err.message);
-                return callback(err, null);
-            }
-            callback(null, rows);
+        db.all(sql, [seniorId, ...statuses], (err, rows) => {
+            callback(err, rows);
         });
     }
+    
     
 }
 

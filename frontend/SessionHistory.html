@@ -32,7 +32,7 @@
 <body>
     <div class="container">
         <h1>Session History</h1>
-        <div id="completedSessionsContainer">
+        <div id="sessionsContainer">
             <p>Loading completed sessions...</p>
         </div>
         <a href="senior_dashboard.html" class="btn btn-primary mt-4">Back to Dashboard</a>
@@ -49,6 +49,13 @@
         }
 
         async function fetchCompletedSessions() {
+            const container = document.getElementById("sessionsContainer");
+            
+            if (!container) {
+                console.error("Container 'sessionsContainer' not found in the DOM.");
+                return; // Exit the function if the container is missing
+            }
+
             try {
                 const response = await fetch(`${backendUrl}/api/tasks/completed-sessions`, {
                     method: "GET",
@@ -58,35 +65,53 @@
                     },
                 });
 
-                const container = document.getElementById("completedSessionsContainer");
-
                 if (response.ok) {
                     const tasks = await response.json();
-                    container.innerHTML = ""; // Clear loading message
+                    container.innerHTML = ""; // Clear existing content
 
                     if (tasks.length > 0) {
                         tasks.forEach((task) => {
-                            const taskCard = `
+                            let feedbackHtml = ""; // Declare feedbackHtml with `let`
+                            if (Array.isArray(task.feedback) && task.feedback.length > 0) {
+                                task.feedback.forEach((fb) => {
+                                    feedbackHtml += `
+                                        <p><strong>Reviewer:</strong> ${fb.reviewer || "Unknown"}</p>
+                                        <p><strong>Rating:</strong> ${fb.rating || "Not Rated"}/5</p>
+                                        <p><strong>Comments:</strong> ${fb.comments || "No comments provided"}</p>
+                                        <hr>
+                                    `;
+                                });
+                            } else {
+                                feedbackHtml = "<p>No feedback available for this task.</p>";
+                            }
+
+                            let taskCard = `
                                 <div class="task-card">
-                                    <h5>${task.title}</h5>
-                                    <p>${task.description}</p>
+                                    <p><strong>Title:</strong> ${task.title}</p>
+                                    <p><strong>Description:</strong> ${task.description || "No description provided"}</p>
                                     <p><strong>Created:</strong> ${new Date(task.time_created).toLocaleString()}</p>
-                                    <p><strong>Completed:</strong> ${new Date(task.time_updated).toLocaleString()}</p>
-                                </div>
-                            `;
-                            container.innerHTML += taskCard;
+                                    <p><strong>Updated:</strong> ${new Date(task.time_updated).toLocaleString()}</p>
+                                    <p><strong>Junior:</strong> ${task.junior_name || "Unknown"}</p>
+                                    <p><strong>Senior:</strong> ${task.senior_name || "Unknown"}</p>
+                                    <p><strong>Status:</strong> ${task.is_approved ? "Approved ✅" : "Completed"}</p>
+                                    <h4>Feedback:</h4>
+                                    <div>${feedbackHtml}</div>
+                                </div>`;
+                            const taskCardElement = document.createElement("div");
+                            taskCardElement.innerHTML = taskCard;
+                            container.appendChild(taskCardElement);
                         });
                     } else {
-                        container.innerHTML = "<p>No completed sessions at the moment.</p>";
+                        container.innerHTML = "<p>No completed sessions found.</p>";
                     }
                 } else {
-                    console.error("Failed to fetch completed sessions.");
+                    const error = await response.json();
+                    console.error("Failed to fetch completed sessions:", error);
                     container.innerHTML = "<p>Could not load completed sessions. Please try again later.</p>";
                 }
             } catch (err) {
                 console.error("Error fetching completed sessions:", err);
-                document.getElementById("completedSessionsContainer").innerHTML =
-                    "<p>Error connecting to the backend. Please try again later.</p>";
+                container.innerHTML = "<p>Error connecting to the backend. Please try again later.</p>";
             }
         }
 

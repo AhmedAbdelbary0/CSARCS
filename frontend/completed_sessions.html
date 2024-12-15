@@ -94,6 +94,7 @@
                                     <h4>Feedback:</h4>
                                     <div>${feedbackHtml}</div>
                                     <button class="btn btn-success" onclick="approveTask(${task.id})">Approve Task</button>
+                                    <button class="btn btn-danger" onclick="declineTask(${task.id})">Decline Task</button>
                                 </div>
                             `;
                             container.innerHTML += taskCard;
@@ -135,6 +136,36 @@
                 }
             } catch (err) {
                 console.error("Error approving task:", err);
+                alert("Could not connect to the backend. Please try again later.");
+            }
+        }
+        async function declineTask(taskId) {
+            const declineReason = prompt(`Enter the reason for declining task ID: ${taskId}:`);
+
+            if (declineReason === null || declineReason.trim() === "") {
+                alert("A reason is required to decline the task.");
+                return;
+            }
+
+            try {
+                const response = await fetch(`${backendUrl}/api/tasks/${taskId}/decline`, {
+                    method: "PATCH",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ message: declineReason }),
+                });
+
+                if (response.ok) {
+                    alert("Task declined successfully!");
+                    fetchCompletedSessions(); // Refresh the list
+                } else {
+                    const error = await response.json();
+                    alert(`Error declining task: ${error.message || "Unknown error"}`);
+                }
+            } catch (err) {
+                console.error("Error declining task:", err);
                 alert("Could not connect to the backend. Please try again later.");
             }
         }

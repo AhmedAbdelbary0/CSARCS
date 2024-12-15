@@ -155,34 +155,42 @@ router.get(
         try {
             const seniorId = req.user.id; // Get logged-in senior's ID from the token
 
-            // Fetch tasks with statuses "completed" and "approved"
+            // Fetch tasks with statuses "completed", "approved", and "declined"
             const tasks = await new Promise((resolve, reject) =>
-                Task.getSessionsByStatuses(seniorId, ['completed', 'approved'], (err, tasks) => {
+                Task.getSessionsByStatuses(seniorId, ['completed', 'approved', 'declined'], (err, tasks) => {
                     if (err) return reject(err);
                     resolve(tasks);
                 })
             );
 
-            // Fetch feedback for each task
-            const tasksWithFeedback = await Promise.all(
+            // Fetch feedback and handle declined tasks for each task
+            const tasksWithDetails = await Promise.all(
                 tasks.map(async (task) => {
+                    // Fetch feedback
                     const feedback = await new Promise((resolve, reject) =>
                         Feedback.getByTaskId(task.id, (err, feedback) => {
                             if (err) return reject(err);
                             resolve(feedback);
                         })
                     );
-                    return { ...task, feedback };
+
+                    // Include decline_message for declined tasks
+                    return {
+                        ...task,
+                        feedback,
+                        decline_message: task.status === 'declined' ? task.decline_message : null,
+                    };
                 })
             );
 
-            res.status(200).json(tasksWithFeedback);
+            res.status(200).json(tasksWithDetails);
         } catch (err) {
             console.error("Error fetching completed sessions:", err.message);
             res.status(500).json({ error: "Internal Server Error", details: err.message });
         }
     }
 );
+
 
 
 
@@ -467,5 +475,28 @@ router.patch(
         }
     }
 );
+
+router.patch(
+    '/:id/decline',
+    authenticateToken,
+    roleMiddleware(['faculty']),
+    async (req, res, next) => {
+        try {
+            const taskId = req.params.id;
+            const { message } = req.body; // Decline message from the request body
+
+            // Update the task's status to 'declined' and save the message
+            await new Promise((resolve, reject) =>
+                Task.decline(taskId, message, (err) => (err ? reject(err) : resolve()))
+            );
+
+            res.status(200).json({ message: 'Task declined successfully' });
+        } catch (err) {
+            console.error('Error declining task:', err);
+            next(err);
+        }
+    }
+);
+
 
 module.exports = router;

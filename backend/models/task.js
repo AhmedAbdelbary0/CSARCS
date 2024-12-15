@@ -34,6 +34,23 @@ class Task {
     });
     }
 
+    static decline(taskId, message, callback) {
+        const sql = `
+            UPDATE Tasks
+            SET status = 'declined', decline_message = ?
+            WHERE id = ?
+        `;
+    
+        db.run(sql, [message, taskId], function (err) {
+            if (err) {
+                callback(err);
+            } else {
+                callback(null);
+            }
+        });
+    }
+    
+
 
     static getByStatus(status, callback) {
         const sql = `SELECT * FROM Tasks WHERE status = ? ORDER BY time_updated DESC`;

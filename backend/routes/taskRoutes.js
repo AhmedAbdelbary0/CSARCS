@@ -45,18 +45,30 @@ router.get(
 // Route to fetch active (assigned) tasks
 router.get(
     '/active-sessions',
-    authenticateToken,
+    authenticateToken, // Ensure the token is valid
     async (req, res, next) => {
         try {
+            const seniorId = req.user.id; // Extract senior's ID from the token
+
+            // Fetch tasks where the logged-in senior is assigned
             const tasks = await new Promise((resolve, reject) =>
-                Task.getByStatus('assigned', (err, tasks) => (err ? reject(err) : resolve(tasks)))
+                Task.getSessionsByStatuses(
+                    seniorId,
+                    ['assigned'], // Only fetch active sessions
+                    (err, tasks) => {
+                        if (err) return reject(err);
+                        resolve(tasks);
+                    }
+                )
             );
 
+            // Enrich tasks with junior and senior details
             const tasksWithDetails = await Promise.all(
                 tasks.map(async (task) => {
                     const junior = await new Promise((resolve, reject) =>
                         User.getById(task.request_id, (err, user) => (err ? reject(err) : resolve(user)))
                     );
+
                     const senior = await new Promise((resolve, reject) =>
                         User.getById(task.accept_id, (err, user) => (err ? reject(err) : resolve(user)))
                     );
@@ -71,11 +83,12 @@ router.get(
 
             res.status(200).json(tasksWithDetails);
         } catch (err) {
-            console.error("Error fetching active sessions:", err);
-            next(err);
+            console.error("Error fetching active sessions:", err.message);
+            res.status(500).json({ error: "Internal Server Error", details: err.message });
         }
     }
 );
+
 
 
 

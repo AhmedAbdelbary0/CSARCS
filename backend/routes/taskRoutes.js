@@ -44,22 +44,17 @@ router.get(
 
 // Route to fetch active (assigned) tasks
 router.get(
-    '/active-sessions',
-    authenticateToken, // Ensure the token is valid
+    '/assigned-tasks',
+    authenticateToken, // Verify token to ensure authenticated access
+    roleMiddleware(['faculty']), // Ensure only faculty can access this route
     async (req, res, next) => {
         try {
-            const seniorId = req.user.id; // Extract senior's ID from the token
-
-            // Fetch tasks where the logged-in senior is assigned
+            // Fetch all tasks with status 'assigned'
             const tasks = await new Promise((resolve, reject) =>
-                Task.getSessionsByStatuses(
-                    seniorId,
-                    ['assigned'], // Only fetch active sessions
-                    (err, tasks) => {
-                        if (err) return reject(err);
-                        resolve(tasks);
-                    }
-                )
+                Task.getByStatus('assigned', (err, tasks) => {
+                    if (err) return reject(err);
+                    resolve(tasks);
+                })
             );
 
             // Enrich tasks with junior and senior details
@@ -83,11 +78,13 @@ router.get(
 
             res.status(200).json(tasksWithDetails);
         } catch (err) {
-            console.error("Error fetching active sessions:", err.message);
+            console.error("Error fetching assigned tasks:", err.message);
             res.status(500).json({ error: "Internal Server Error", details: err.message });
         }
     }
 );
+
+
 
 
 

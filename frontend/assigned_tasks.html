@@ -53,7 +53,7 @@
         // Fetch and display assigned tasks
         async function fetchAssignedTasks() {
             try {
-                const response = await fetch(`${backendUrl}/api/tasks/active-sessions`, {
+                const response = await fetch(`${backendUrl}/api/tasks/assigned-tasks`, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${token}`,

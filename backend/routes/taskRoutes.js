@@ -153,28 +153,38 @@ router.get(
     roleMiddleware(['senior']),
     async (req, res, next) => {
         try {
-            const seniorId = req.user.id; // Get logged-in user's ID from the token
+            const seniorId = req.user.id; // Get logged-in senior's ID from the token
 
-            // Fetch tasks with statuses 'completed' and 'approved' assigned to the current user
+            // Fetch tasks with statuses "completed" and "approved"
             const tasks = await new Promise((resolve, reject) =>
-                Task.getSessionsByStatuses(seniorId, ['completed', 'approved'], (err, tasks) =>
-                    err ? reject(err) : resolve(tasks)
-                )
+                Task.getSessionsByStatuses(seniorId, ['completed', 'approved'], (err, tasks) => {
+                    if (err) return reject(err);
+                    resolve(tasks);
+                })
             );
 
-            // Add is_approved field to indicate task status
-            const tasksWithApprovalFlag = tasks.map((task) => ({
-                ...task,
-                is_approved: task.status === 'approved', // Add true if the status is 'approved'
-            }));
+            // Fetch feedback for each task
+            const tasksWithFeedback = await Promise.all(
+                tasks.map(async (task) => {
+                    const feedback = await new Promise((resolve, reject) =>
+                        Feedback.getByTaskId(task.id, (err, feedback) => {
+                            if (err) return reject(err);
+                            resolve(feedback);
+                        })
+                    );
+                    return { ...task, feedback };
+                })
+            );
 
-            res.status(200).json(tasksWithApprovalFlag);
+            res.status(200).json(tasksWithFeedback);
         } catch (err) {
-            console.error('Error fetching completed and approved sessions:', err.message);
-            next(err);
+            console.error("Error fetching completed sessions:", err.message);
+            res.status(500).json({ error: "Internal Server Error", details: err.message });
         }
     }
 );
+
+
 
 
 

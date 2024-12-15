@@ -50,10 +50,10 @@
 
         async function fetchCompletedSessions() {
             const container = document.getElementById("sessionsContainer");
-            
+
             if (!container) {
                 console.error("Container 'sessionsContainer' not found in the DOM.");
-                return; // Exit the function if the container is missing
+                return; // Exit if container is missing
             }
 
             try {
@@ -70,14 +70,19 @@
                     container.innerHTML = ""; // Clear existing content
 
                     if (tasks.length > 0) {
+                        // Render each task
                         tasks.forEach((task) => {
-                            let feedbackHtml = ""; // Declare feedbackHtml with `let`
+                            let feedbackHtml = "";
+
+                            // Check and render feedback
                             if (Array.isArray(task.feedback) && task.feedback.length > 0) {
                                 task.feedback.forEach((fb) => {
                                     feedbackHtml += `
-                                        <p><strong>Reviewer:</strong> ${fb.reviewer || "Unknown"}</p>
-                                        <p><strong>Rating:</strong> ${fb.rating || "Not Rated"}/5</p>
-                                        <p><strong>Comments:</strong> ${fb.comments || "No comments provided"}</p>
+                                        <div style="margin-bottom: 10px;">
+                                            <p><strong>Reviewer:</strong> ${fb.reviewer || "Unknown"}</p>
+                                            <p><strong>Rating:</strong> ${fb.rating || "Not Rated"}/5</p>
+                                            <p><strong>Comments:</strong> ${fb.comments || "No comments provided"}</p>
+                                        </div>
                                         <hr>
                                     `;
                                 });
@@ -85,21 +90,21 @@
                                 feedbackHtml = "<p>No feedback available for this task.</p>";
                             }
 
-                            let taskCard = `
+                            // Render the task with feedback
+                            const taskCard = `
                                 <div class="task-card">
                                     <p><strong>Title:</strong> ${task.title}</p>
                                     <p><strong>Description:</strong> ${task.description || "No description provided"}</p>
                                     <p><strong>Created:</strong> ${new Date(task.time_created).toLocaleString()}</p>
                                     <p><strong>Updated:</strong> ${new Date(task.time_updated).toLocaleString()}</p>
-                                    <p><strong>Junior:</strong> ${task.junior_name || "Unknown"}</p>
-                                    <p><strong>Senior:</strong> ${task.senior_name || "Unknown"}</p>
                                     <p><strong>Status:</strong> ${task.is_approved ? "Approved ✅" : "Completed"}</p>
                                     <h4>Feedback:</h4>
                                     <div>${feedbackHtml}</div>
-                                </div>`;
-                            const taskCardElement = document.createElement("div");
-                            taskCardElement.innerHTML = taskCard;
-                            container.appendChild(taskCardElement);
+                                </div>
+                            `;
+
+                            // Append to container
+                            container.innerHTML += taskCard;
                         });
                     } else {
                         container.innerHTML = "<p>No completed sessions found.</p>";
@@ -114,6 +119,7 @@
                 container.innerHTML = "<p>Error connecting to the backend. Please try again later.</p>";
             }
         }
+
 
         // Fetch completed sessions on page load
         window.onload = fetchCompletedSessions;

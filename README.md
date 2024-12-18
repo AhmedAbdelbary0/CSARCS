@@ -1,175 +1,30 @@
-                                        CS ARCS API Documentation
-                                        Base URL: http://localhost:3000/api
-Authentication
-Login
-Endpoint: /auth/login
-Method: POST
-Description: Logs in a user and returns a JWT token.
-Request Body:
-{
-  "email": "user@example.com",
-  "password": "password123"
-}
-Response:
-Success:
-{
-  "message": "Login successful",
-  "token": "jwt_token"
-}
-Failure:
-{
-  "error": "Invalid email or password"
-}
-Register
-Endpoint: /auth/register
-Method: POST
-Description: Registers a new user.
-Request Body:
-{
-  "username": "johndoe",
-  "email": "johndoe@example.com",
-  "password": "securepassword",
-  "role": "junior"
-}
-Response:
-Success:
-{
-  "message": "User created successfully",
-  "id": 1
-}
-Failure:
-{
-  "error": "Error creating user",
-  "details": "Specific error message"
-}
-Users
-Get All Users
-Endpoint: /users
-Method: GET
-Authentication: Required (Bearer Token)
-Role: Admin-only (requires roleMiddleware(['admin'])).
-Query Parameters:
-None.
-Response:
-Success:
+# Project Name: CS ARCS
+###### A project by Ahmed Abdelbary, Seba Alzahir and Lamiaa Abushara for the 390: 'Software Engineering' project, Fall 2024/2025.
 
-[
-  {
-    "id": 1,
-    "username": "johndoe",
-    "email": "johndoe@example.com",
-    "role": "junior"
-  },
-  {
-    "id": 2,
-    "username": "janedoe",
-    "email": "janedoe@example.com",
-    "role": "senior"
-  }
-]
-Tasks
-Get All Tasks
-Endpoint: /tasks
-Method: GET
-Authentication: Required (Bearer Token)
-Role: Senior students only (requires roleMiddleware(['senior'])).
-Response:
-Success:
-[
-  {
-    "id": 1,
-    "title": "Help with Java",
-    "description": "I need help with Java basics",
-    "status": "open",
-    "request_id": 1,
-    "accept_id": null,
-    "time_created": "2024-11-20T08:00:00.000Z"
-  }
-]
-Create Task
-Endpoint: /tasks
-Method: POST
-Authentication: Required (Bearer Token)
-Role: Junior students only (requires roleMiddleware(['junior'])).
-Request Body:
-{
-  "title": "New Task",
-  "description": "Task details",
-  "status": "open",
-  "request_id": 1
-}
-Response:
-Success:
-{
-  "message": "Task created successfully",
-  "id": 1
-}
-Update Task Status
-Endpoint: /tasks/:id/status
-Method: PUT
-Authentication: Required (Bearer Token)
-Role: Senior or Faculty.
-Request Body:
-{
-  "status": "completed"
-}
-Response:
-Success:
-{
-  "message": "Task status updated successfully"
-}
-Failure:
-{
-  "error": "Error updating task status"
-}
-Notifications
-Get All Notifications
-Endpoint: /notifications
-Method: GET
-Authentication: Required (Bearer Token)
-Description: Fetches all notifications for the logged-in user.
-Response:
-Success:
-[
-  {
-    "id": 1,
-    "user_id": 1,
-    "message": "You have a new task assigned",
-    "time_created": "2024-11-20T10:00:00.000Z"
-  }
-]
-Feedback
-Fetch Feedback by Task ID
-Endpoint: /feedback/task/:task_id
-Method: GET
-Authentication: Required (Bearer Token)
-Role: Faculty (requires roleMiddleware(['faculty'])).
-Response:
-Success:
-[
-  {
-    "id": 1,
-    "task_id": 1,
-    "user_id": 1,
-    "rating": 5,
-    "comments": "Great work!",
-    "time_created": "2024-11-20T10:00:00.000Z"
-  }
-]
-Fetch Feedback by User ID
-Endpoint: /feedback/user/:user_id
-Method: GET
-Authentication: Required (Bearer Token)
-Role: Faculty.
-Response:
-Success:
-[
-  {
-    "id": 1,
-    "task_id": 1,
-    "user_id": 2,
-    "rating": 4,
-    "comments": "Good effort.",
-    "time_created": "2024-11-20T09:00:00.000Z"
-  }
-]
+### 1.Requirements
+Before running the system, ensure you have the following installed:
+
+Node.js (v14 or higher)
+npm (Node Package Manager)
+SQLite3 database (pre-configured for the system)
+
+### 2.Running the System
+write this in the command line when in the CSARCS directory: node backend/index.js
+this starts the server and it will run on http://localhost:3000.
+after you start the server, access the frontend directory and and launch the index.html file in your browser.
+
+### Notes
+Login Credentials: Use pre-configured credentials or create accounts via the signup button.
+
+#### some pre-configured credentials:
+#### senior
+Email: me@example.com
+Password: weakpassword
+
+#### junior
+Email: johndoe@example.com
+Password: strongpassword
+
+#### faculty
+Email: jd@example.com
+Password: password123

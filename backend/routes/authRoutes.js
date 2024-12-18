@@ -7,8 +7,7 @@ const bcrypt = require('bcrypt');
 const User = require('../models/user');
 const AppError = require('../utils/AppError'); // Import custom AppError
 
-const JWT_SECRET = 'your_secret_key'; // Replace with a strong secret in production
-
+const JWT_SECRET = 'your_secret_key';
 // Middleware to handle validation errors
 const handleValidationErrors = (req, res, next) => {
     const errors = validationResult(req);

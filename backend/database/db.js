@@ -1,7 +1,6 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
-// Define the database file path
 const dbPath = path.resolve(__dirname, 'database.sqlite');
 
 // Open the database connection

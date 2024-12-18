@@ -5,8 +5,8 @@ const Task = require('../models/task');
 const Notification = require('../models/notification');
 const { authenticateToken } = require('../middleware/authMiddleware');
 const roleMiddleware = require('../middleware/roleMiddleware');
-const User = require('../models/user'); // Adjust the path based on your project structure
-const Feedback = require('../models/feedback'); // Adjust the path if necessary
+const User = require('../models/user'); 
+const Feedback = require('../models/feedback');
 
 const AppError = require('../utils/AppError'); // Import custom AppError
 

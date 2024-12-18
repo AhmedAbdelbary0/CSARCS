@@ -103,11 +103,17 @@ router.get('/me', authenticateToken, async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        res.json({ id: user.id, username: user.username, role: user.role });
+        // Include the email field
+        res.json({ 
+            id: user.id, 
+            username: user.username, 
+            role: user.role, 
+            email: user.email 
+        });
     } catch (err) {
         res.status(500).json({ message: 'Server error', error: err.message });
     }
-}); 
+});
 
 
 

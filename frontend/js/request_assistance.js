@@ -47,3 +47,8 @@ async function handleFormSubmission(event) {
         alert("Could not connect to the backend. Please try again later.");
     }
 }
+
+// Function to navigate back to the dashboard
+function navigateToDashboard() {
+    window.location.href = "junior_dashboard.html"; // Replace 'dashboard.html' with your dashboard page URL
+}

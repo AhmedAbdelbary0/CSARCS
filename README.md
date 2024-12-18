@@ -9,7 +9,7 @@ npm (Node Package Manager)
 SQLite3 database (pre-configured for the system)
 
 ### 2.Running the System
-write this in the command line when in the CSARCS directory: node backend/index.js
+write this in the command line when in the CSARCS directory: "node backend/index.js"
 this starts the server and it will run on http://localhost:3000.
 after you start the server, access the frontend directory and and launch the index.html file in your browser.
 

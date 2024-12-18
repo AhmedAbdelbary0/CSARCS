@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Junior Dashboard</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="css/styles.css">
     <style>
         html, body {
             font-family: Arial, sans-serif;
@@ -199,13 +199,13 @@
             <p><strong>ID:</strong> Loading...</p>
         </div>
         
-        <h3>Active Requests:</h3>
-        <div class="requests">
-            <ul>
-                <li>Loading requests...</li>
-            </ul>
-        </div>
         <a href="request_assistance.html" class="button">Request New Assistance</a>
+        
+        <h3>Active Requests:</h3>
+        <div class="requests" id="requestsContainer">
+            <p>Loading requests...</p>
+        </div>
+        
         
         <!-- Confirmation Section -->
         <div id="confirmationMessage" class="confirmation" style="display: none;">

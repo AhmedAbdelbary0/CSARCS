@@ -1,4 +1,4 @@
-    const backendUrl = "http://localhost:3000"; // Update with your backend URL
+    const backendUrl = "http://localhost:3000";
         const token = localStorage.getItem("token"); // Retrieve token from localStorage
 
         // Redirect to login if no token is found

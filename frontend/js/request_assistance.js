@@ -1,7 +1,7 @@
 async function handleFormSubmission(event) {
     event.preventDefault(); // Prevent the default form submission behavior
 
-    const backendUrl = "http://localhost:3000"; // Replace with your backend URL
+    const backendUrl = "http://localhost:3000";
     const token = localStorage.getItem("token"); // Retrieve token from localStorage
 
     // Redirect to login if token is missing

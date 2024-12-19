@@ -1,4 +1,4 @@
-const backendUrl = "http://localhost:3000"; // Update with your backend URL
+const backendUrl = "http://localhost:3000";
 
             document.getElementById("loginForm").addEventListener("submit", async function (event) {
             event.preventDefault(); // Prevent page refresh

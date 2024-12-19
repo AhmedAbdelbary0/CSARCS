@@ -7,7 +7,7 @@ const taskRoutes = require('./routes/taskRoutes'); // Import task routes
 const feedbackRoutes = require('./routes/feedbackRoutes'); // Import feedback routes
 const notificationRoutes = require('./routes/notificationRoutes'); // Import notification routes
 const authRoutes = require('./routes/authRoutes'); // Import authentication routes
-const errorHandler = require('./middleware/errorHandler'); // Import the error handler middleware
+const errorHandler = require('./middleware/errorhandler'); // Import the error handler middleware
 
 // Create the express app
 const app = express();

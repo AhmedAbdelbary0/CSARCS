@@ -1,5 +1,5 @@
 module.exports = (allowedRoles) => (req, res, next) => {
-    const user = req.user; // Assuming `req.user` is added by verifyToken middleware
+    const user = req.user;
 
     // Check if the user's role is in the array of allowed roles
     if (!allowedRoles.includes(user.role)) {
